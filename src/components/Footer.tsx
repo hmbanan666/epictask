@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const Footer = () => (
   <>
-    <Center>
+    <Center style={{ marginTop: 90, marginBottom: 50 }}>
       <Link href="https://github.com/hmbanan666/epictask" target="_blank">
         <Button radius="xl" variant="light" color="violet">
           <IconBrandGithub size={30} />

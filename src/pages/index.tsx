@@ -1,16 +1,57 @@
 import React from 'react';
 import { type NextPage } from 'next';
-import { Container } from '@mantine/core';
-import { Logo } from '../components/Logo';
+import {
+  Badge,
+  Button,
+  Card,
+  Container,
+  Grid,
+  Group,
+  Text,
+  Title,
+} from '@mantine/core';
+import Link from 'next/link';
 import { Footer } from '../components/Footer';
+import { Header } from '../components/Header';
+import { globalStyles } from '../utils/styles';
+
+const EpicCard = () => {
+  const { theme } = globalStyles();
+
+  return (
+    <Card
+      p="lg"
+      radius="md"
+      withBorder
+      style={{ borderColor: theme.colors.gray[1] }}
+    >
+      <Group position="apart" mt="md" mb="xs">
+        <Text weight={500}>Платформа для разработчиков</Text>
+        <Badge color="orange" variant="light">
+          Идет разработка
+        </Badge>
+      </Group>
+
+      <Text size="sm" color="dimmed">
+        Я устал от раскиданной повсюду информации, хочу собрать все в одном
+        месте. Что-то вроде своего блога, но более публичного.
+      </Text>
+
+      <Link href="/e/1" style={{ textDecoration: 'none' }}>
+        <Button variant="light" color="violet" fullWidth mt="md" radius="md">
+          Открыть Эпик #1
+        </Button>
+      </Link>
+    </Card>
+  );
+};
 
 const HomePage: NextPage = () => (
   <>
-    <Container style={{ marginTop: 60, marginBottom: 60 }}>
-      <Logo />
-
+    <Header />
+    <Container style={{ marginBottom: 60 }}>
       <div>
-        <h1>Epic Task</h1>
+        <Title order={1}>Epic Task</Title>
         <p>
           Онлайн площадка для разработчиков, на которой можно [будет, в течение
           2023 года]:
@@ -35,6 +76,17 @@ const HomePage: NextPage = () => (
             разработчиков, на их профили.
           </li>
         </ul>
+      </div>
+
+      <div style={{ marginTop: 80 }}>
+        <Title order={2} mb={20}>
+          Эпики
+        </Title>
+        <Grid>
+          <Grid.Col sm={6}>
+            <EpicCard />
+          </Grid.Col>
+        </Grid>
       </div>
     </Container>
 
