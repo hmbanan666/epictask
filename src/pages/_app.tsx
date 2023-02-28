@@ -24,6 +24,16 @@ const MyApp: AppType<{ session: Session | null }> = ({
         withNormalizeCSS
         theme={{
           colorScheme: 'light',
+          globalStyles: (theme) => ({
+            pre: {
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              padding: '1rem 1rem',
+              background: theme.colors.violet[0],
+              borderRadius: theme.radius.md,
+              overflow: 'auto',
+            },
+          }),
         }}
       >
         <Component {...pageProps} />
