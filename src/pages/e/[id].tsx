@@ -1,14 +1,59 @@
 import { type NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { Box, Card, Container, Grid, List, Title } from '@mantine/core';
-import React from 'react';
+import {
+  Avatar,
+  Badge,
+  Box,
+  Card,
+  Container,
+  Grid,
+  Group,
+  List,
+  Text,
+  ThemeIcon,
+  Title,
+  UnstyledButton,
+} from '@mantine/core';
 import Head from 'next/head';
+import Link from 'next/link';
+import { IconBrandGithub, IconExternalLink } from '@tabler/icons-react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
 
+const TaskCard = () => {
+  const { classes } = globalStyles();
+
+  return (
+    <Card p="lg" className={classes.coolCard}>
+      <Group position="apart" mt="xs" mb="xs">
+        <Text weight={500}>Начнем же</Text>
+        <Badge color="orange" variant="light">
+          Задача #1
+        </Badge>
+      </Group>
+
+      <Text size="sm" color="dimmed">
+        Создал репозиторий, собрал первые страницы на Next.js, добавил
+        визуальную часть с помощью Mantine, собрал все в Docker контейнер.
+      </Text>
+
+      <Box mt={20}>
+        <Link href="/t/1" style={{ textDecoration: 'none' }}>
+          <UnstyledButton
+            className={classes.coolButton}
+            style={{ minWidth: '100%', textAlign: 'center' }}
+          >
+            Открыть Задачу #1
+          </UnstyledButton>
+        </Link>
+      </Box>
+    </Card>
+  );
+};
+
 const EpicPage: NextPage = () => {
-  const { theme } = globalStyles();
+  const { classes } = globalStyles();
   const { query } = useRouter();
   const id = query.id as string;
 
@@ -142,24 +187,82 @@ const EpicPage: NextPage = () => {
             </Box>
           </Grid.Col>
           <Grid.Col md={4}>
-            <Card
-              p="lg"
-              radius="md"
-              withBorder
-              style={{ borderColor: theme.colors.gray[1] }}
-            >
+            <Card p="lg" className={classes.coolCard}>
               <Title order={3} style={{ marginBottom: 10 }}>
                 Эпик #{id}
               </Title>
-              <List listStyleType="none">
+              <List listStyleType="none" spacing={10}>
                 <List.Item>
-                  <b>Платформа:</b> Веб
+                  <b>Создан:</b> 27 февраля 2023 года
                 </List.Item>
                 <List.Item>
                   <b>Дедлайн:</b> Конец 2023 года
                 </List.Item>
                 <List.Item>
-                  <b>Основатель:</b> Николай Косарев
+                  <b>Платформа:</b> Веб
+                </List.Item>
+                <List.Item>
+                  <b>Бюджет:</b> 2 бутерброда с колбасой
+                </List.Item>
+                <List.Item>
+                  <b>Основатель:</b>{' '}
+                  <div>
+                    <Link href="/u/hmbanan666">
+                      <UnstyledButton className={classes.coolButton}>
+                        <Group spacing={8}>
+                          <Avatar
+                            src="https://avatar.o5system.net/api/f3a0d471-af9c-4716-9e30-98720b612e02.svg?gender=male&emotion=7&size=140"
+                            size="sm"
+                            radius="xl"
+                          />
+                          <Text>Николай Косарев</Text>
+                        </Group>
+                      </UnstyledButton>
+                    </Link>
+                  </div>
+                </List.Item>
+                <List.Item>
+                  <b>Репозиторий:</b>{' '}
+                  <div>
+                    <Link
+                      href="https://github.com/hmbanan666/epictask"
+                      target="_blank"
+                    >
+                      <UnstyledButton className={classes.coolButton}>
+                        <Group spacing={8}>
+                          <ThemeIcon
+                            color="violet"
+                            radius="xl"
+                            size="md"
+                            variant="light"
+                          >
+                            <IconBrandGithub size={20} />
+                          </ThemeIcon>
+                          <Text>GitHub</Text>
+                        </Group>
+                      </UnstyledButton>
+                    </Link>
+                  </div>
+                </List.Item>
+                <List.Item>
+                  <b>Веб-сайт:</b>{' '}
+                  <div>
+                    <Link href="https://epictask.online" target="_blank">
+                      <UnstyledButton className={classes.coolButton}>
+                        <Group spacing={8}>
+                          <ThemeIcon
+                            color="violet"
+                            radius="xl"
+                            size="md"
+                            variant="light"
+                          >
+                            <IconExternalLink size={20} />
+                          </ThemeIcon>
+                          <Text>https://epictask.online</Text>
+                        </Group>
+                      </UnstyledButton>
+                    </Link>
+                  </div>
                 </List.Item>
               </List>
             </Card>
@@ -169,7 +272,11 @@ const EpicPage: NextPage = () => {
         <Title order={2} style={{ marginTop: 20, marginBottom: 10 }}>
           Выполненные Задачи
         </Title>
-        <p>Тут пока пусто</p>
+        <Grid>
+          <Grid.Col md={6}>
+            <TaskCard />
+          </Grid.Col>
+        </Grid>
       </Container>
 
       <Footer />

@@ -2,13 +2,14 @@ import React from 'react';
 import { type NextPage } from 'next';
 import {
   Badge,
-  Button,
+  Box,
   Card,
   Container,
   Grid,
   Group,
   Text,
   Title,
+  UnstyledButton,
 } from '@mantine/core';
 import Link from 'next/link';
 import { Footer } from '../components/Footer';
@@ -16,16 +17,11 @@ import { Header } from '../components/Header';
 import { globalStyles } from '../utils/styles';
 
 const EpicCard = () => {
-  const { theme } = globalStyles();
+  const { classes } = globalStyles();
 
   return (
-    <Card
-      p="lg"
-      radius="md"
-      withBorder
-      style={{ borderColor: theme.colors.gray[1] }}
-    >
-      <Group position="apart" mt="md" mb="xs">
+    <Card p="lg" className={classes.coolCard}>
+      <Group position="apart" mt="xs" mb="xs">
         <Text weight={500}>Платформа для разработчиков</Text>
         <Badge color="orange" variant="light">
           Идет разработка
@@ -37,11 +33,16 @@ const EpicCard = () => {
         месте. Что-то вроде своего блога, но более публичного.
       </Text>
 
-      <Link href="/e/1" style={{ textDecoration: 'none' }}>
-        <Button variant="light" color="violet" fullWidth mt="md" radius="md">
-          Открыть Эпик #1
-        </Button>
-      </Link>
+      <Box mt={20}>
+        <Link href="/e/1" style={{ textDecoration: 'none' }}>
+          <UnstyledButton
+            className={classes.coolButton}
+            style={{ minWidth: '100%', textAlign: 'center' }}
+          >
+            Открыть Эпик #1
+          </UnstyledButton>
+        </Link>
+      </Box>
     </Card>
   );
 };
@@ -80,7 +81,7 @@ const HomePage: NextPage = () => (
 
       <div style={{ marginTop: 80 }}>
         <Title order={2} mb={20}>
-          Эпики
+          Новые Эпики
         </Title>
         <Grid>
           <Grid.Col sm={6}>

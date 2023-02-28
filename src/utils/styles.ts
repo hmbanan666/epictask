@@ -10,29 +10,19 @@ export const globalStyles = createStyles((theme) => ({
     },
   },
   coolButton: {
-    paddingTop: 15,
-    paddingBottom: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
     fontSize: 15,
     fontWeight: 700,
     borderRadius: 14,
-    minHeight: 48,
-    backgroundColor: theme.colors.blue[5],
+    minHeight: 36,
+    color: '#fff',
+    backgroundColor: theme.colors.violet[4],
 
     '&:hover': {
-      backgroundColor: theme.colors.blue[7],
-    },
-  },
-  coolButtonTeal: {
-    paddingTop: 15,
-    paddingBottom: 15,
-    fontSize: 15,
-    fontWeight: 700,
-    borderRadius: 14,
-    minHeight: 48,
-    backgroundColor: theme.colors.teal[5],
-
-    '&:hover': {
-      backgroundColor: theme.colors.teal[7],
+      backgroundColor: theme.colors.violet[5],
     },
   },
   coolCard: {
