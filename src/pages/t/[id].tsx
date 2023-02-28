@@ -27,7 +27,10 @@ const TaskPage = () => {
   const { query } = useRouter();
   const id = query.id as string;
 
-  const { data: task } = api.data.task.useQuery({ id });
+  const { data: taskData } = api.data.task.useQuery({ id });
+
+  const task = taskData?.task;
+  const epic = taskData?.epic;
 
   const parsedText = marked.parse(task?.text || '');
 
@@ -37,7 +40,7 @@ const TaskPage = () => {
     <>
       <Head>
         <title>
-          {task.title} | Задача в Эпике #{task.epicId}
+          {task.title} | Задача в Эпике {task.epicId}
         </title>
       </Head>
 
@@ -58,10 +61,10 @@ const TaskPage = () => {
 
           <Grid.Col md={4}>
             <Card p="lg" className={classes.coolCard}>
-              <Title order={3} style={{ marginBottom: 10 }}>
-                Задача #{task.id}
-              </Title>
-              <List listStyleType="none" spacing={10}>
+              <Title order={3}>Задача</Title>
+              <Text mb={10}>{task.id}</Text>
+
+              <List listStyleType="none" spacing={14}>
                 <List.Item>
                   <b>В Эпике:</b>{' '}
                   <div>
@@ -76,17 +79,19 @@ const TaskPage = () => {
                           >
                             <IconChecklist size={20} />
                           </ThemeIcon>
-                          <Text>{task.epicTitle}</Text>
+                          <Text>{epic?.title}</Text>
                         </Group>
                       </UnstyledButton>
                     </Link>
                   </div>
                 </List.Item>
                 <List.Item>
-                  <b>Создана:</b> {localTime(task.createdAt, true)}
+                  <b>Создана:</b>
+                  <div>{localTime(task.createdAt, true)}</div>
                 </List.Item>
                 <List.Item>
-                  <b>Выполнена:</b> {localTime(task.completedAt, true)}
+                  <b>Выполнена:</b>
+                  <div>{localTime(task.completedAt, true)}</div>
                 </List.Item>
                 <List.Item>
                   <b>Исполнители:</b>{' '}
@@ -106,7 +111,8 @@ const TaskPage = () => {
                   </div>
                 </List.Item>
                 <List.Item>
-                  <b>Опыт:</b> TypeScript, React, Next.js, Docker, tRPC, Node.js
+                  <b>Опыт:</b>
+                  <div>TypeScript, React, Next.js, Docker, tRPC, Node.js</div>
                 </List.Item>
               </List>
             </Card>

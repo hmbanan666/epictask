@@ -1,4 +1,4 @@
-export function localTime(date: string | Date, showYear = false) {
+export function localTime(date: string | Date | null, showYear = false) {
   if (!date) return '-';
 
   return new Date(date).toLocaleString('ru-RU', {

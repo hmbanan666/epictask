@@ -4,22 +4,30 @@ import { Avatar, Card, Container, Grid, List, Title } from '@mantine/core';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
+import { api } from '../../utils/api';
+import { localTime } from '../../utils/date';
 
 const UserProfilePage = () => {
   const { classes } = globalStyles();
   const { query } = useRouter();
   const id = query.id as string;
 
+  const { data: user } = api.data.user.useQuery({ username: id });
+
+  if (!user) return null;
+
   return (
     <>
       <Head>
-        <title>Николай Косарев | Профиль специалиста на Эпике @{id}</title>
+        <title>
+          {user?.name} {user?.surname} | Профиль специалиста на Эпике @{id}
+        </title>
       </Head>
 
       <Header />
       <Container style={{ marginBottom: 60 }}>
         <Title order={1} style={{ marginBottom: 20 }}>
-          Николай Косарев
+          {user?.name} {user?.surname}
         </Title>
 
         <Grid>
@@ -33,13 +41,13 @@ const UserProfilePage = () => {
 
               <List listStyleType="none">
                 <List.Item>
-                  <b>Создан:</b> 27 февраля 2023 года
+                  <b>Создан:</b> {localTime(user?.createdAt)}
                 </List.Item>
                 <List.Item>
-                  <b>Никнейм:</b> hmbanan666
+                  <b>Никнейм:</b> {user?.username}
                 </List.Item>
                 <List.Item>
-                  <b>Блог:</b> https://kosarev.space
+                  <b>Блог:</b> -
                 </List.Item>
               </List>
             </Card>

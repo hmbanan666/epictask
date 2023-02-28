@@ -14,54 +14,57 @@ import Link from 'next/link';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
+import { api } from '../../utils/api';
 
-const EpicCard = () => {
+const EpicsPage = () => {
   const { classes } = globalStyles();
 
+  const { data: epics } = api.data.epics.useQuery();
+
   return (
-    <Card p="lg" className={classes.coolCard}>
-      <Group position="apart" mt="xs" mb="xs">
-        <Text weight={500}>Платформа для разработчиков</Text>
-        <Badge color="orange" variant="light">
-          Идет разработка
-        </Badge>
-      </Group>
+    <>
+      <Header />
+      <Container style={{ marginBottom: 60 }}>
+        <Title order={1} style={{ marginBottom: 20 }}>
+          Новые Эпики
+        </Title>
 
-      <Text size="sm" color="dimmed">
-        Я устал от раскиданной повсюду информации, хочу собрать все в одном
-        месте. Что-то вроде своего блога, но более публичного.
-      </Text>
+        <Grid>
+          {epics?.map((epic) => (
+            <Grid.Col key={epic.id} sm={6}>
+              <Card p="lg" className={classes.coolCard}>
+                <Group position="apart" mt="xs" mb="xs">
+                  <Text weight={500}>{epic?.title}</Text>
+                  <Badge color="orange" variant="light">
+                    Идет разработка
+                  </Badge>
+                </Group>
 
-      <Box mt={20}>
-        <Link href="/e/1" style={{ textDecoration: 'none' }}>
-          <UnstyledButton
-            className={classes.coolButton}
-            style={{ minWidth: '100%', textAlign: 'center' }}
-          >
-            Открыть Эпик #1
-          </UnstyledButton>
-        </Link>
-      </Box>
-    </Card>
+                <Text size="sm" color="dimmed">
+                  {epic?.description}
+                </Text>
+
+                <Box mt={20}>
+                  <Link
+                    href={`/e/${epic?.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <UnstyledButton
+                      className={classes.coolButton}
+                      style={{ minWidth: '100%', textAlign: 'center' }}
+                    >
+                      Открыть этот Эпик
+                    </UnstyledButton>
+                  </Link>
+                </Box>
+              </Card>
+            </Grid.Col>
+          ))}
+        </Grid>
+      </Container>
+      <Footer />
+    </>
   );
 };
-
-const EpicsPage = () => (
-  <>
-    <Header />
-    <Container style={{ marginBottom: 60 }}>
-      <Title order={1} style={{ marginBottom: 20 }}>
-        Новые Эпики
-      </Title>
-
-      <Grid>
-        <Grid.Col sm={6}>
-          <EpicCard />
-        </Grid.Col>
-      </Grid>
-    </Container>
-    <Footer />
-  </>
-);
 
 export default EpicsPage;
