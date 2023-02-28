@@ -20,42 +20,14 @@ import { IconBrandGithub, IconExternalLink } from '@tabler/icons-react';
 import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
-
-const TaskCard = () => {
-  const { classes } = globalStyles();
-
-  return (
-    <Card p="lg" className={classes.coolCard}>
-      <Group position="apart" mt="xs" mb="xs">
-        <Text weight={500}>Начнем же</Text>
-        <Badge color="orange" variant="light">
-          Задача #1
-        </Badge>
-      </Group>
-
-      <Text size="sm" color="dimmed">
-        Создал репозиторий, собрал первые страницы на Next.js, добавил
-        визуальную часть с помощью Mantine, собрал все в Docker контейнер.
-      </Text>
-
-      <Box mt={20}>
-        <Link href="/t/1" style={{ textDecoration: 'none' }}>
-          <UnstyledButton
-            className={classes.coolButton}
-            style={{ minWidth: '100%', textAlign: 'center' }}
-          >
-            Открыть Задачу #1
-          </UnstyledButton>
-        </Link>
-      </Box>
-    </Card>
-  );
-};
+import { api } from '../../utils/api';
 
 const EpicPage: NextPage = () => {
   const { classes } = globalStyles();
   const { query } = useRouter();
   const id = query.id as string;
+
+  const { data: tasks } = api.data.tasks.useQuery();
 
   return (
     <>
@@ -273,9 +245,36 @@ const EpicPage: NextPage = () => {
           Выполненные Задачи
         </Title>
         <Grid>
-          <Grid.Col md={6}>
-            <TaskCard />
-          </Grid.Col>
+          {tasks?.map((task) => (
+            <Grid.Col key={task.id} md={6}>
+              <Card p="lg" className={classes.coolCard}>
+                <Group position="apart" mt="xs" mb="xs">
+                  <Text weight={500}>{task.title}</Text>
+                  <Badge color="orange" variant="light">
+                    Задача #{task.id}
+                  </Badge>
+                </Group>
+
+                <Text size="sm" color="dimmed">
+                  {task.description}
+                </Text>
+
+                <Box mt={20}>
+                  <Link
+                    href={`/t/${task.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <UnstyledButton
+                      className={classes.coolButton}
+                      style={{ minWidth: '100%', textAlign: 'center' }}
+                    >
+                      Открыть Задачу #{task.id}
+                    </UnstyledButton>
+                  </Link>
+                </Box>
+              </Card>
+            </Grid.Col>
+          ))}
         </Grid>
       </Container>
 

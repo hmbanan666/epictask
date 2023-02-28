@@ -10,8 +10,8 @@ export const globalStyles = createStyles((theme) => ({
     },
   },
   coolButton: {
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 6,
+    paddingBottom: 6,
     paddingLeft: 10,
     paddingRight: 10,
     fontSize: 15,
