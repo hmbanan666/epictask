@@ -8,8 +8,8 @@ export const dataRouter = createTRPCRouter({
       const epic = await ctx.prisma.epic.findUnique({
         where: { id: input.id },
         include: {
-          User: true,
-          Task: {
+          user: true,
+          task: {
             orderBy: {
               createdAt: 'desc',
             },
@@ -20,8 +20,8 @@ export const dataRouter = createTRPCRouter({
 
       return {
         epic,
-        author: epic.User,
-        tasks: epic.Task,
+        author: epic.user,
+        tasks: epic.task,
       };
     }),
   epics: publicProcedure.query(({ ctx }) => ctx.prisma.epic.findMany()),
@@ -41,14 +41,14 @@ export const dataRouter = createTRPCRouter({
       const task = await ctx.prisma.task.findUnique({
         where: { id: input.id },
         include: {
-          Epic: true,
+          epic: true,
         },
       });
       if (!task) return null;
 
       return {
         task,
-        epic: task.Epic,
+        epic: task.epic,
       };
     }),
 });

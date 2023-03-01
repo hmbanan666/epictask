@@ -26,5 +26,6 @@ module.exports = {
       },
     ],
     "@typescript-eslint/no-unsafe-assignment": "warn",
+    "no-void": "off",
   },
 };

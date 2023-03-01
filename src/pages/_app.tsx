@@ -1,9 +1,10 @@
 import { type AppType } from 'next/app';
 import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
-import { MantineProvider } from '@mantine/core';
+import { AppShell, MantineProvider } from '@mantine/core';
 import Head from 'next/head';
 import { api } from '../utils/api';
+import { MyHeader } from '../components/MyHeader';
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -26,17 +27,27 @@ const MyApp: AppType<{ session: Session | null }> = ({
           colorScheme: 'light',
           globalStyles: (theme) => ({
             pre: {
-              fontFamily: 'monospace',
               fontSize: '0.9rem',
               padding: '1rem 1rem',
-              background: theme.colors.violet[0],
+              background: theme.colors.gray[0],
               borderRadius: theme.radius.md,
               overflow: 'auto',
+            },
+            ul: {
+              paddingLeft: '1.5rem',
+            },
+            li: {
+              paddingBottom: '0.5rem',
+              '&::marker': {
+                color: theme.colors.dark[2],
+              },
             },
           }),
         }}
       >
-        <Component {...pageProps} />
+        <AppShell header={<MyHeader />}>
+          <Component {...pageProps} />
+        </AppShell>
       </MantineProvider>
     </SessionProvider>
   </>

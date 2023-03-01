@@ -11,7 +11,6 @@ import {
 } from '@mantine/core';
 import React from 'react';
 import Link from 'next/link';
-import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
 import { api } from '../../utils/api';
@@ -23,8 +22,7 @@ const EpicsPage = () => {
 
   return (
     <>
-      <Header />
-      <Container style={{ marginBottom: 60 }}>
+      <Container className={classes.wrapper}>
         <Title order={1} style={{ marginBottom: 20 }}>
           Новые Эпики
         </Title>
@@ -50,7 +48,7 @@ const EpicsPage = () => {
                     style={{ textDecoration: 'none' }}
                   >
                     <UnstyledButton
-                      className={classes.coolButton}
+                      className={classes.epicButton}
                       style={{ minWidth: '100%', textAlign: 'center' }}
                     >
                       Открыть этот Эпик

@@ -13,14 +13,14 @@ model User {
   updatedAt      DateTime         @updatedAt
   name           String
   surname        String?
-  username       String           @unique
+  username       String?          @unique @default(cuid())
   email          String?          @unique
   emailVerified  DateTime?
   image          String?
-  Accounts       Account[]
-  Sessions       Session[]
-  TaskAssignment TaskAssignment[]
-  Epic           Epic[]
+  accounts       Account[]
+  sessions       Session[]
+  taskAssignment TaskAssignment[]
+  epic           Epic[]
 }
 
 model Epic {
@@ -37,8 +37,8 @@ model Epic {
   budget        String?
   repositoryUrl String?
   websiteUrl    String?
-  Task          Task[]
-  User          User      @relation(fields: [authorId], references: [id])
+  task          Task[]
+  user          User      @relation(fields: [authorId], references: [id])
 }
 
 model Task {
@@ -51,8 +51,8 @@ model Task {
   title          String
   description    String
   text           String?
-  Epic           Epic             @relation(fields: [epicId], references: [id])
-  TaskAssignment TaskAssignment[]
+  epic           Epic             @relation(fields: [epicId], references: [id])
+  taskAssignment TaskAssignment[]
 }
 
 model TaskAssignment {
@@ -61,25 +61,26 @@ model TaskAssignment {
   updatedAt DateTime @updatedAt
   userId    String
   taskId    String
-  User      User     @relation(fields: [userId], references: [id])
-  Task      Task     @relation(fields: [taskId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id])
 }
 
 // Necessary for Next auth
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.Text
+  refresh_token_expires_in Int?
+  access_token             String? @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.Text
+  session_state            String?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -89,7 +90,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {

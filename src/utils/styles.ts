@@ -9,7 +9,7 @@ export const globalStyles = createStyles((theme) => ({
       padding: 15,
     },
   },
-  coolButton: {
+  epicButton: {
     paddingTop: 6,
     paddingBottom: 6,
     paddingLeft: 10,
@@ -23,6 +23,38 @@ export const globalStyles = createStyles((theme) => ({
 
     '&:hover': {
       backgroundColor: theme.colors.violet[5],
+    },
+  },
+  rareButton: {
+    paddingTop: 6,
+    paddingBottom: 6,
+    paddingLeft: 10,
+    paddingRight: 10,
+    fontSize: 15,
+    fontWeight: 700,
+    borderRadius: 14,
+    minHeight: 36,
+    color: '#fff',
+    backgroundColor: theme.colors.blue[4],
+
+    '&:hover': {
+      backgroundColor: theme.colors.blue[5],
+    },
+  },
+  commonButton: {
+    paddingTop: 6,
+    paddingBottom: 6,
+    paddingLeft: 10,
+    paddingRight: 10,
+    fontSize: 15,
+    fontWeight: 700,
+    borderRadius: 14,
+    minHeight: 36,
+    color: '#fff',
+    backgroundColor: theme.colors.green[5],
+
+    '&:hover': {
+      backgroundColor: theme.colors.green[6],
     },
   },
   coolCard: {

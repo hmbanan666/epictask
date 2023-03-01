@@ -13,7 +13,6 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 import { Footer } from '../components/Footer';
-import { Header } from '../components/Header';
 import { globalStyles } from '../utils/styles';
 import { api } from '../utils/api';
 
@@ -24,8 +23,7 @@ const HomePage: NextPage = () => {
 
   return (
     <>
-      <Header />
-      <Container style={{ marginBottom: 60 }}>
+      <Container className={classes.wrapper}>
         <div>
           <Title order={1}>Epic Task</Title>
           <p>
@@ -79,7 +77,7 @@ const HomePage: NextPage = () => {
                       style={{ textDecoration: 'none' }}
                     >
                       <UnstyledButton
-                        className={classes.coolButton}
+                        className={classes.epicButton}
                         style={{ minWidth: '100%', textAlign: 'center' }}
                       >
                         Открыть этот Эпик

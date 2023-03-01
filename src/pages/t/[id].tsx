@@ -17,7 +17,6 @@ import Link from 'next/link';
 import { IconChecklist } from '@tabler/icons-react';
 import { marked } from 'marked';
 import { globalStyles } from '../../utils/styles';
-import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
 import { localTime } from '../../utils/date';
@@ -44,8 +43,7 @@ const TaskPage = () => {
         </title>
       </Head>
 
-      <Header />
-      <Container style={{ marginBottom: 60 }}>
+      <Container className={classes.wrapper}>
         <Title order={1} style={{ marginBottom: 20 }}>
           {task.title}
         </Title>
@@ -69,7 +67,7 @@ const TaskPage = () => {
                   <b>В Эпике:</b>{' '}
                   <div>
                     <Link href={`/e/${task.epicId}`}>
-                      <UnstyledButton className={classes.coolButton}>
+                      <UnstyledButton className={classes.epicButton}>
                         <Group spacing={8}>
                           <ThemeIcon
                             color="violet"
@@ -97,7 +95,7 @@ const TaskPage = () => {
                   <b>Исполнители:</b>{' '}
                   <div>
                     <Link href="/u/hmbanan666">
-                      <UnstyledButton className={classes.coolButton}>
+                      <UnstyledButton className={classes.epicButton}>
                         <Group spacing={8}>
                           <Avatar
                             src="https://avatar.o5system.net/api/f3a0d471-af9c-4716-9e30-98720b612e02.svg?gender=male&emotion=7&size=140"

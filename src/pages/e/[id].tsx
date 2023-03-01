@@ -17,7 +17,6 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { IconBrandGithub, IconExternalLink } from '@tabler/icons-react';
 import { marked } from 'marked';
-import { Header } from '../../components/Header';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
 import { api } from '../../utils/api';
@@ -46,8 +45,7 @@ const EpicPage: NextPage = () => {
         <title>Платформа для разработчиков | Эпик {id}</title>
       </Head>
 
-      <Header />
-      <Container style={{ marginBottom: 60 }}>
+      <Container className={classes.wrapper}>
         <Title order={1} style={{ marginBottom: 20 }}>
           Платформа для разработчиков
         </Title>
@@ -101,13 +99,9 @@ const EpicPage: NextPage = () => {
                     <b>Автор:</b>{' '}
                     <div>
                       <Link href={`/u/${author?.username}`}>
-                        <UnstyledButton className={classes.coolButton}>
+                        <UnstyledButton className={classes.epicButton}>
                           <Group spacing={8}>
-                            <Avatar
-                              src="https://avatar.o5system.net/api/f3a0d471-af9c-4716-9e30-98720b612e02.svg?gender=male&emotion=7&size=140"
-                              size="sm"
-                              radius="xl"
-                            />
+                            <Avatar src={author?.image} size="sm" radius="xl" />
                             <Text>
                               {author?.name} {author?.surname}
                             </Text>
@@ -123,7 +117,7 @@ const EpicPage: NextPage = () => {
                     <b>Репозиторий:</b>{' '}
                     <div>
                       <Link href={epic.repositoryUrl} target="_blank">
-                        <UnstyledButton className={classes.coolButton}>
+                        <UnstyledButton className={classes.epicButton}>
                           <Group spacing={8}>
                             <ThemeIcon
                               color="violet"
@@ -146,7 +140,7 @@ const EpicPage: NextPage = () => {
                     <b>Веб-сайт:</b>{' '}
                     <div>
                       <Link href={epic?.websiteUrl} target="_blank">
-                        <UnstyledButton className={classes.coolButton}>
+                        <UnstyledButton className={classes.epicButton}>
                           <Group spacing={8}>
                             <ThemeIcon
                               color="violet"
@@ -189,7 +183,7 @@ const EpicPage: NextPage = () => {
                     style={{ textDecoration: 'none' }}
                   >
                     <UnstyledButton
-                      className={classes.coolButton}
+                      className={classes.commonButton}
                       style={{ minWidth: '100%', textAlign: 'center' }}
                     >
                       Открыть эту Задачу
