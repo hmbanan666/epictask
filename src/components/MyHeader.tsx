@@ -1,11 +1,12 @@
 import React from 'react';
-import { Avatar, Button, Group, Header } from '@mantine/core';
+import { Button, Group, Header } from '@mantine/core';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { signIn, useSession } from 'next-auth/react';
 import { IconBrandGithub } from '@tabler/icons-react';
 import { Logo } from './Logo';
 import { globalStyles } from '../utils/styles';
+import { UserMenu } from './UserMenu';
 
 export const MyHeader = () => {
   const { classes, theme } = globalStyles();
@@ -23,9 +24,7 @@ export const MyHeader = () => {
     return (
       <>
         {session ? (
-          <Link href={`/u/${session.user?.username}`}>
-            <Avatar src={session.user?.image} size={40} radius="xl" />
-          </Link>
+          <UserMenu />
         ) : (
           <Button
             className={classes.epicButton}

@@ -21,6 +21,7 @@ declare module 'next-auth' {
     user: {
       id: string;
       username: string;
+      surname?: string;
       // ...other properties
       // role: UserRole;
     } & DefaultSession['user'];
@@ -28,6 +29,7 @@ declare module 'next-auth' {
 
   interface User {
     username: string;
+    surname?: string;
     // ...other properties
     // role: UserRole;
   }
@@ -46,6 +48,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = user.id;
         // eslint-disable-next-line no-param-reassign
         session.user.username = user.username;
+        // eslint-disable-next-line no-param-reassign
+        session.user.surname = user.surname;
         // session.user.role = user.role; <-- put other properties on the session here
       }
       return session;

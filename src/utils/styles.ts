@@ -6,7 +6,7 @@ export const globalStyles = createStyles((theme) => ({
     minHeight: '100vh',
 
     [theme.fn.smallerThan('xs')]: {
-      padding: 15,
+      padding: 0,
     },
   },
   epicButton: {
