@@ -12,6 +12,7 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import Link from 'next/link';
+import { type Epic } from '@prisma/client';
 import { Footer } from '../components/Footer';
 import { globalStyles } from '../utils/styles';
 import { api } from '../utils/api';
@@ -19,7 +20,7 @@ import { api } from '../utils/api';
 const HomePage: NextPage = () => {
   const { classes } = globalStyles();
 
-  const { data: epics } = api.data.epics.useQuery();
+  const { data: epics } = api.epic.findMany.useQuery();
 
   return (
     <>
@@ -57,7 +58,7 @@ const HomePage: NextPage = () => {
             Новые Эпики
           </Title>
           <Grid>
-            {epics?.map((epic) => (
+            {epics?.map((epic: Epic) => (
               <Grid.Col key={epic.id} sm={6}>
                 <Card p="lg" className={classes.coolCard}>
                   <Group position="apart" mt="xs" mb="xs">

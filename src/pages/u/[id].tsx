@@ -11,7 +11,7 @@ const UserProfilePage = () => {
   const { query } = useRouter();
   const id = query.id as string;
 
-  const { data: user } = api.data.user.useQuery({ username: id });
+  const { data: user } = api.user.username.useQuery({ username: id });
 
   if (!user) return null;
 

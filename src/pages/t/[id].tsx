@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { IconChecklist } from '@tabler/icons-react';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
-import { type Task } from '.prisma/client';
+import { type Task } from '@prisma/client';
 import { globalStyles } from '../../utils/styles';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
@@ -28,13 +28,13 @@ import TextEditor from '../../components/TextEditor';
 const EditingTaskBlock = ({
   task,
   isSaving,
-  taskDataRefetch,
+  dataRefetch,
   setIsSaving,
   setIsEditing,
 }: {
   task: Task;
   isSaving: boolean;
-  taskDataRefetch: () => unknown;
+  dataRefetch: () => unknown;
   setIsSaving: (value: boolean) => void;
   setIsEditing: (value: boolean) => void;
 }) => {
@@ -44,8 +44,8 @@ const EditingTaskBlock = ({
   const [description, setDescription] = useState<string>(task?.description);
   const [text, setText] = useState<string>(task?.text || '');
 
-  const taskMutation = api.data.editTask.useMutation({
-    onSuccess: () => taskDataRefetch(),
+  const taskMutation = api.task.update.useMutation({
+    onSuccess: () => dataRefetch(),
   });
 
   // If we need to save data
@@ -66,7 +66,7 @@ const EditingTaskBlock = ({
     <>
       <Box style={{ marginBottom: 40 }}>
         <Text className={classes.coolTextEditorBlockTitle}>
-          Заголовок задачи:
+          Заголовок Задачи:
         </Text>
         <TextEditor
           textOnly
@@ -75,7 +75,7 @@ const EditingTaskBlock = ({
         />
 
         <Text className={classes.coolTextEditorBlockTitle}>
-          Короткое описание задачи:
+          Короткое описание:
         </Text>
         <TextEditor
           textOnly
@@ -83,7 +83,7 @@ const EditingTaskBlock = ({
           onUpdate={(value) => setDescription(value || '')}
         />
 
-        <Text className={classes.coolTextEditorBlockTitle}>Текст задачи:</Text>
+        <Text className={classes.coolTextEditorBlockTitle}>Текст:</Text>
         <TextEditor
           htmlContent={text}
           onUpdate={(value) => setText(value || '')}
@@ -100,7 +100,7 @@ const TaskPage = () => {
 
   const { data: session } = useSession();
 
-  const { data: taskData, refetch: taskDataRefetch } = api.data.task.useQuery({
+  const { data: taskData, refetch: taskDataRefetch } = api.task.id.useQuery({
     id,
   });
 
@@ -112,10 +112,6 @@ const TaskPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleClickStopEditingAndSave = () => {
-    setIsSaving(true);
-  };
-
   const AuthorTaskBlock = () => {
     const handleClickStartEditing = () => {
       setIsEditing((prev) => !prev);
@@ -125,9 +121,13 @@ const TaskPage = () => {
       setIsEditing((prev) => !prev);
     };
 
+    const handleClickStopEditingAndSave = () => {
+      setIsSaving(true);
+    };
+
     return (
       <Card className={classes.coolCard} mb={40}>
-        <Title order={3}>Вы автор этой задачи</Title>
+        <Title order={3}>Вы автор этой Задачи</Title>
         <Text>Выберите необходимое действие. Может пару новых строк?</Text>
 
         <Group mt={20}>
@@ -167,7 +167,7 @@ const TaskPage = () => {
         {isAuthor && <AuthorTaskBlock />}
         <EditingTaskBlock
           task={task}
-          taskDataRefetch={taskDataRefetch}
+          dataRefetch={taskDataRefetch}
           isSaving={isSaving}
           setIsSaving={setIsSaving}
           setIsEditing={setIsEditing}

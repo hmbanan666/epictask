@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
-export const dataRouter = createTRPCRouter({
-  epic: publicProcedure
+export const epicRouter = createTRPCRouter({
+  id: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
       const epic = await ctx.prisma.epic.findUnique({
@@ -24,53 +24,27 @@ export const dataRouter = createTRPCRouter({
         tasks: epic.task,
       };
     }),
-  epics: publicProcedure.query(({ ctx }) => ctx.prisma.epic.findMany()),
-  user: publicProcedure
-    .input(z.object({ username: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const user = await ctx.prisma.user.findUnique({
-        where: { username: input.username },
-      });
-      if (!user) return null;
-
-      return user;
-    }),
-  task: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const task = await ctx.prisma.task.findUnique({
-        where: { id: input.id },
-        include: {
-          epic: true,
-          user: true,
-        },
-      });
-      if (!task) return null;
-
-      return {
-        task,
-        epic: task.epic,
-        author: task.user,
-      };
-    }),
-  editTask: protectedProcedure
+  findMany: publicProcedure.query(({ ctx }) => ctx.prisma.epic.findMany()),
+  update: protectedProcedure
     .input(
       z.object({
         id: z.string(),
         title: z.string(),
         description: z.string(),
         text: z.string(),
+        solvesProblem: z.string(),
       })
     )
     .mutation(({ input, ctx }) => {
       const authorId = ctx.session.user.id;
 
-      return ctx.prisma.task.updateMany({
+      return ctx.prisma.epic.updateMany({
         where: { id: input.id, authorId },
         data: {
           title: input.title,
           description: input.description,
           text: input.text,
+          solvesProblem: input.solvesProblem,
         },
       });
     }),

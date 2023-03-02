@@ -18,7 +18,7 @@ import { api } from '../../utils/api';
 const EpicsPage = () => {
   const { classes } = globalStyles();
 
-  const { data: epics } = api.data.epics.useQuery();
+  const { data: epics } = api.epic.findMany.useQuery();
 
   return (
     <>
