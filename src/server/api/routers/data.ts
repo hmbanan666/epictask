@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createTRPCRouter, publicProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
 export const dataRouter = createTRPCRouter({
   epic: publicProcedure
@@ -42,6 +42,7 @@ export const dataRouter = createTRPCRouter({
         where: { id: input.id },
         include: {
           epic: true,
+          user: true,
         },
       });
       if (!task) return null;
@@ -49,6 +50,26 @@ export const dataRouter = createTRPCRouter({
       return {
         task,
         epic: task.epic,
+        author: task.user,
       };
     }),
+  editTask: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        description: z.string(),
+        text: z.string(),
+      })
+    )
+    .mutation(({ input, ctx }) =>
+      ctx.prisma.task.update({
+        where: { id: input.id },
+        data: {
+          title: input.title,
+          description: input.description,
+          text: input.text,
+        },
+      })
+    ),
 });

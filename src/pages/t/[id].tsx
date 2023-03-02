@@ -3,6 +3,7 @@ import Head from 'next/head';
 import {
   Avatar,
   Box,
+  Button,
   Card,
   Container,
   Grid,
@@ -15,25 +16,160 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 import { IconChecklist } from '@tabler/icons-react';
-import { marked } from 'marked';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { type Task } from '.prisma/client';
 import { globalStyles } from '../../utils/styles';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
 import { localTime } from '../../utils/date';
+import TextEditor from '../../components/TextEditor';
+
+const EditingTaskBlock = ({
+  task,
+  isSaving,
+  taskDataRefetch,
+  setIsSaving,
+  setIsEditing,
+}: {
+  task: Task;
+  isSaving: boolean;
+  taskDataRefetch: () => unknown;
+  setIsSaving: (value: boolean) => void;
+  setIsEditing: (value: boolean) => void;
+}) => {
+  const { classes } = globalStyles();
+
+  const [title, setTitle] = useState<string>(task?.title);
+  const [description, setDescription] = useState<string>(task?.description);
+  const [text, setText] = useState<string>(task?.text || '');
+
+  const taskMutation = api.data.editTask.useMutation({
+    onSuccess: () => taskDataRefetch(),
+  });
+
+  // If we need to save data
+  useEffect(() => {
+    if (isSaving && task?.id) {
+      taskMutation.mutate({ id: task.id, title, description, text });
+      setIsSaving(false);
+      setIsEditing(false);
+    }
+  }, [isSaving]);
+
+  return (
+    <>
+      <Box style={{ marginBottom: 40 }}>
+        <Text className={classes.coolTextEditorBlockTitle}>
+          Заголовок задачи:
+        </Text>
+        <TextEditor
+          textOnly
+          htmlContent={title}
+          onUpdate={(value) => setTitle(value || '')}
+        />
+
+        <Text className={classes.coolTextEditorBlockTitle}>
+          Короткое описание задачи:
+        </Text>
+        <TextEditor
+          textOnly
+          htmlContent={description}
+          onUpdate={(value) => setDescription(value || '')}
+        />
+
+        <Text className={classes.coolTextEditorBlockTitle}>Текст задачи:</Text>
+        <TextEditor
+          htmlContent={text}
+          onUpdate={(value) => setText(value || '')}
+        />
+      </Box>
+    </>
+  );
+};
 
 const TaskPage = () => {
   const { classes } = globalStyles();
   const { query } = useRouter();
   const id = query.id as string;
 
-  const { data: taskData } = api.data.task.useQuery({ id });
+  const { data: session } = useSession();
+
+  const { data: taskData, refetch: taskDataRefetch } = api.data.task.useQuery({
+    id,
+  });
 
   const task = taskData?.task;
   const epic = taskData?.epic;
+  const author = taskData?.author;
 
-  const parsedText = marked.parse(task?.text || '');
+  const isAuthor = session?.user?.id === task?.authorId;
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleClickStopEditingAndSave = () => {
+    setIsSaving(true);
+  };
+
+  const AuthorTaskBlock = () => {
+    const handleClickStartEditing = () => {
+      setIsEditing((prev) => !prev);
+    };
+
+    const handleClickStopEditing = () => {
+      setIsEditing((prev) => !prev);
+    };
+
+    return (
+      <Card className={classes.coolCard} mb={40}>
+        <Title order={3}>Вы автор этой задачи</Title>
+        <Text>Выберите необходимое действие. Может пару новых строк?</Text>
+
+        <Group mt={20}>
+          {isEditing ? (
+            <>
+              <Button
+                className={classes.commonButton}
+                onClick={handleClickStopEditingAndSave}
+              >
+                Закончить редактирование
+              </Button>
+              <Button
+                className={classes.rareButton}
+                onClick={handleClickStopEditing}
+              >
+                Отменить
+              </Button>
+            </>
+          ) : (
+            <Button
+              className={classes.rareButton}
+              onClick={handleClickStartEditing}
+            >
+              Начать редактирование
+            </Button>
+          )}
+        </Group>
+      </Card>
+    );
+  };
 
   if (!task) return null;
+
+  if (isEditing) {
+    return (
+      <Container className={classes.wrapper}>
+        {isAuthor && <AuthorTaskBlock />}
+        <EditingTaskBlock
+          task={task}
+          taskDataRefetch={taskDataRefetch}
+          isSaving={isSaving}
+          setIsSaving={setIsSaving}
+          setIsEditing={setIsEditing}
+        />
+      </Container>
+    );
+  }
 
   return (
     <>
@@ -44,6 +180,8 @@ const TaskPage = () => {
       </Head>
 
       <Container className={classes.wrapper}>
+        {isAuthor && <AuthorTaskBlock />}
+
         <Title order={1} style={{ marginBottom: 20 }}>
           {task.title}
         </Title>
@@ -53,7 +191,7 @@ const TaskPage = () => {
             <Box style={{ marginBottom: 40 }}>
               <p>{task.description}</p>
 
-              <div dangerouslySetInnerHTML={{ __html: parsedText }} />
+              <div dangerouslySetInnerHTML={{ __html: task?.text || '' }} />
             </Box>
           </Grid.Col>
 
@@ -92,17 +230,15 @@ const TaskPage = () => {
                   <div>{localTime(task.completedAt, true)}</div>
                 </List.Item>
                 <List.Item>
-                  <b>Исполнители:</b>{' '}
+                  <b>Автор:</b>{' '}
                   <div>
-                    <Link href="/u/hmbanan666">
+                    <Link href={`/u/${author?.username || ''}`}>
                       <UnstyledButton className={classes.epicButton}>
                         <Group spacing={8}>
-                          <Avatar
-                            src="https://avatar.o5system.net/api/f3a0d471-af9c-4716-9e30-98720b612e02.svg?gender=male&emotion=7&size=140"
-                            size="sm"
-                            radius="xl"
-                          />
-                          <Text>Николай Косарев</Text>
+                          <Avatar src={author?.image} size="sm" radius="xl" />
+                          <Text>
+                            {author?.name} {author?.surname}
+                          </Text>
                         </Group>
                       </UnstyledButton>
                     </Link>

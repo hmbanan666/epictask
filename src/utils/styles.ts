@@ -62,4 +62,22 @@ export const globalStyles = createStyles((theme) => ({
     borderRadius: theme.radius.lg,
     minWidth: '100%',
   },
+  // Text editor
+  coolTextEditorBlockTitle: {
+    fontSize: 20,
+    fontWeight: 700,
+    color: theme.colors.dark[1],
+  },
+  coolTextEditorRoot: {
+    border: 'none',
+    marginBottom: 30,
+  },
+  coolTextEditorContent: {
+    backgroundColor: theme.colors.gray[0],
+    borderRadius: theme.radius.lg,
+
+    pre: {
+      backgroundColor: theme.colors.gray[1],
+    },
+  },
 }));

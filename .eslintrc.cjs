@@ -25,7 +25,7 @@ module.exports = {
         fixStyle: "inline-type-imports",
       },
     ],
-    "@typescript-eslint/no-unsafe-assignment": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "off",
     "no-void": "off",
   },
 };

@@ -21,6 +21,7 @@ model User {
   sessions       Session[]
   taskAssignment TaskAssignment[]
   epic           Epic[]
+  task           Task[]
 }
 
 model Epic {
@@ -51,8 +52,10 @@ model Task {
   title          String
   description    String
   text           String?
+  authorId       String
   epic           Epic             @relation(fields: [epicId], references: [id])
   taskAssignment TaskAssignment[]
+  user           User             @relation(fields: [authorId], references: [id])
 }
 
 model TaskAssignment {

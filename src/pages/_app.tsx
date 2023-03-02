@@ -37,7 +37,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
               paddingLeft: '1.5rem',
             },
             li: {
-              paddingBottom: '0.5rem',
               '&::marker': {
                 color: theme.colors.dark[2],
               },
