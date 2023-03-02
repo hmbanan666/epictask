@@ -3,8 +3,10 @@ import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { AppShell, MantineProvider } from '@mantine/core';
 import Head from 'next/head';
+import { NotificationsProvider } from '@mantine/notifications';
 import { api } from '../utils/api';
 import { MyHeader } from '../components/MyHeader';
+import { RouterTransition } from '../components/RouterTransition';
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -26,6 +28,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
         theme={{
           colorScheme: 'light',
           globalStyles: (theme) => ({
+            code: {
+              fontFamily:
+                'Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New',
+            },
             pre: {
               fontSize: '0.9rem',
               padding: '1rem 1rem',
@@ -44,9 +50,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
           }),
         }}
       >
-        <AppShell header={<MyHeader />}>
-          <Component {...pageProps} />
-        </AppShell>
+        <NotificationsProvider position="top-center">
+          <AppShell header={<MyHeader />}>
+            <RouterTransition />
+            <Component {...pageProps} />
+          </AppShell>
+        </NotificationsProvider>
       </MantineProvider>
     </SessionProvider>
   </>

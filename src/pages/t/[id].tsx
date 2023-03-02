@@ -15,10 +15,11 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import Link from 'next/link';
-import { IconChecklist } from '@tabler/icons-react';
+import { IconCheck, IconChecklist } from '@tabler/icons-react';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { type Task } from '@prisma/client';
+import { showNotification, updateNotification } from '@mantine/notifications';
 import { globalStyles } from '../../utils/styles';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
@@ -45,29 +46,46 @@ const EditingTaskBlock = ({
   const [text, setText] = useState<string>(task?.text || '');
 
   const taskMutation = api.task.update.useMutation({
-    onSuccess: () => dataRefetch(),
+    onSuccess: () => {
+      dataRefetch();
+      updateNotification({
+        id: 'update-task',
+        color: 'green',
+        title: 'Задача успешно обновлена!',
+        message: 'Все хорошо. Сейчас обновим данные на странице',
+        icon: <IconCheck size={16} />,
+        autoClose: 2500,
+      });
+    },
   });
 
-  // If we need to save data
   useEffect(() => {
-    if (isSaving && task?.id) {
-      taskMutation.mutate({
-        id: task.id,
-        title,
-        description,
-        text,
-      });
-      setIsSaving(false);
-      setIsEditing(false);
-    }
+    if (!isSaving || !task?.id) return;
+
+    showNotification({
+      id: 'update-task',
+      loading: true,
+      title: 'Обновляем Задачу...',
+      message: 'Данные побежали на сервер, база зашуршала',
+      color: 'blue',
+      autoClose: false,
+      disallowClose: true,
+    });
+
+    taskMutation.mutate({
+      id: task.id,
+      title,
+      description,
+      text,
+    });
+    setIsSaving(false);
+    setIsEditing(false);
   }, [isSaving]);
 
   return (
     <>
       <Box style={{ marginBottom: 40 }}>
-        <Text className={classes.coolTextEditorBlockTitle}>
-          Заголовок Задачи:
-        </Text>
+        <Text className={classes.coolTextEditorBlockTitle}>Заголовок:</Text>
         <TextEditor
           textOnly
           htmlContent={title}

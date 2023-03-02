@@ -1,5 +1,14 @@
-import { Avatar, Box, Group, Indicator, Menu, Text } from '@mantine/core';
 import {
+  Avatar,
+  Box,
+  Button,
+  Group,
+  Indicator,
+  Menu,
+  Text,
+} from '@mantine/core';
+import {
+  IconCheck,
   IconLogout,
   IconPencilPlus,
   IconUserCircle,
@@ -7,12 +16,16 @@ import {
 import { signOut, useSession } from 'next-auth/react';
 import React from 'react';
 import Link from 'next/link';
-import { createId } from '@paralleldrive/cuid2';
+import { showNotification, updateNotification } from '@mantine/notifications';
+import { useRouter } from 'next/router';
 import { globalStyles } from '../utils/styles';
 import { CoolModal } from './CoolModal';
+import { CoolInputWithTooltip } from './CoolInputWithTooltip';
+import { api } from '../utils/api';
 
 export const UserMenu = () => {
-  const { theme } = globalStyles();
+  const { classes, theme } = globalStyles();
+  const router = useRouter();
 
   const { data: session } = useSession();
 
@@ -21,6 +34,50 @@ export const UserMenu = () => {
   };
 
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = React.useState(false);
+
+  // Create new task
+  const [title, setTitle] = React.useState('');
+  const [description, setDescription] = React.useState('');
+
+  const taskMutation = api.task.create.useMutation({
+    onSuccess: (data) => {
+      if (!data?.id) return;
+
+      updateNotification({
+        id: 'create-task',
+        color: 'green',
+        title: 'Задача успешно создана!',
+        message: 'Все хорошо. Сейчас сделаем редирект',
+        icon: <IconCheck size={16} />,
+        autoClose: 2500,
+      });
+
+      void router.push(`/t/${data?.id}`);
+    },
+  });
+
+  const handleClickAddNewTask = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    if (!title || !description) return;
+
+    e.preventDefault();
+    showNotification({
+      id: 'create-task',
+      loading: true,
+      title: 'Создаем Задачу...',
+      message: 'Данные побежали на сервер, база зашуршала',
+      color: 'blue',
+      autoClose: false,
+      disallowClose: true,
+    });
+
+    setIsNewTaskModalOpen(false);
+    taskMutation.mutate({
+      title,
+      description,
+    });
+  };
 
   if (!session) return null;
 
@@ -145,11 +202,40 @@ export const UserMenu = () => {
       </Menu>
 
       <CoolModal
-        title="Новая задача"
+        title="Новая Задача"
         opened={isNewTaskModalOpen}
         onClose={() => setIsNewTaskModalOpen(false)}
       >
-        <>{createId()}</>
+        <form>
+          <CoolInputWithTooltip
+            label="Заголовок"
+            maxLength={50}
+            required
+            value={title}
+            onChange={setTitle}
+          >
+            Не используйте спецсимволы и теги
+          </CoolInputWithTooltip>
+          <CoolInputWithTooltip
+            type="textarea"
+            label="Короткое описание"
+            maxLength={200}
+            required
+            value={description}
+            onChange={setDescription}
+          >
+            Один абзац, в котором основная суть задачи. Не используйте
+            спецсимволы и теги
+          </CoolInputWithTooltip>
+
+          <Button
+            type="submit"
+            onClick={(e) => handleClickAddNewTask(e)}
+            className={classes.rareButton}
+          >
+            Создать Задачу
+          </Button>
+        </form>
       </CoolModal>
     </>
   );

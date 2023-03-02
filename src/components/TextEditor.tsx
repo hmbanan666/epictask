@@ -36,8 +36,11 @@ const TextEditor = ({
           <RichTextEditor.ControlsGroup>
             <RichTextEditor.Bold />
             <RichTextEditor.Italic />
-            <RichTextEditor.Link />
+            <RichTextEditor.H2 />
+            <RichTextEditor.H3 />
+            <RichTextEditor.H4 />
             <RichTextEditor.CodeBlock />
+            <RichTextEditor.Link />
           </RichTextEditor.ControlsGroup>
         </BubbleMenu>
       )}

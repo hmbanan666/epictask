@@ -69,8 +69,8 @@ export default createStyles((theme) => ({
     borderRadius: 14,
     borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: theme.colors.gray[2],
-    background: theme.colors.gray[2],
+    borderColor: theme.colors.gray[0],
+    background: theme.colors.gray[0],
     display: 'flex',
     flexDirection: 'row',
     gap: theme.spacing.md,
@@ -78,6 +78,6 @@ export default createStyles((theme) => ({
   tooltipInputLength: {
     fontSize: theme.fontSizes.xs,
     fontWeight: 700,
-    color: theme.colors.gray[5],
+    color: theme.colors.dark[1],
   },
 }));

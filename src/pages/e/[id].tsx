@@ -16,10 +16,15 @@ import {
 } from '@mantine/core';
 import Head from 'next/head';
 import Link from 'next/link';
-import { IconBrandGithub, IconExternalLink } from '@tabler/icons-react';
+import {
+  IconBrandGithub,
+  IconCheck,
+  IconExternalLink,
+} from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { type Epic } from '@prisma/client';
+import { showNotification, updateNotification } from '@mantine/notifications';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
 import { api } from '../../utils/api';
@@ -49,30 +54,47 @@ const EditingEpicBlock = ({
   );
 
   const epicMutation = api.epic.update.useMutation({
-    onSuccess: () => dataRefetch(),
+    onSuccess: () => {
+      dataRefetch();
+      updateNotification({
+        id: 'update-epic',
+        color: 'teal',
+        title: 'Эпик успешно обновлен!',
+        message: 'Все хорошо. Сейчас обновим данные на странице',
+        icon: <IconCheck size={16} />,
+        autoClose: 2500,
+      });
+    },
   });
 
-  // If we need to save data
   useEffect(() => {
-    if (isSaving && epic?.id) {
-      epicMutation.mutate({
-        id: epic.id,
-        title,
-        description,
-        text,
-        solvesProblem,
-      });
-      setIsSaving(false);
-      setIsEditing(false);
-    }
+    if (!isSaving || !epic?.id) return;
+
+    showNotification({
+      id: 'update-epic',
+      loading: true,
+      title: 'Обновляем Эпик...',
+      message: 'Данные побежали на сервер, база зашуршала',
+      color: 'blue',
+      autoClose: false,
+      disallowClose: true,
+    });
+
+    epicMutation.mutate({
+      id: epic.id,
+      title,
+      description,
+      text,
+      solvesProblem,
+    });
+    setIsSaving(false);
+    setIsEditing(false);
   }, [isSaving]);
 
   return (
     <>
       <Box style={{ marginBottom: 40 }}>
-        <Text className={classes.coolTextEditorBlockTitle}>
-          Заголовок Эпика:
-        </Text>
+        <Text className={classes.coolTextEditorBlockTitle}>Заголовок:</Text>
         <TextEditor
           textOnly
           htmlContent={title}
