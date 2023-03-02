@@ -51,7 +51,12 @@ const EditingTaskBlock = ({
   // If we need to save data
   useEffect(() => {
     if (isSaving && task?.id) {
-      taskMutation.mutate({ id: task.id, title, description, text });
+      taskMutation.mutate({
+        id: task.id,
+        title,
+        description,
+        text,
+      });
       setIsSaving(false);
       setIsEditing(false);
     }

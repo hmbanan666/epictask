@@ -62,14 +62,16 @@ export const dataRouter = createTRPCRouter({
         text: z.string(),
       })
     )
-    .mutation(({ input, ctx }) =>
-      ctx.prisma.task.update({
-        where: { id: input.id },
+    .mutation(({ input, ctx }) => {
+      const authorId = ctx.session.user.id;
+
+      return ctx.prisma.task.updateMany({
+        where: { id: input.id, authorId },
         data: {
           title: input.title,
           description: input.description,
           text: input.text,
         },
-      })
-    ),
+      });
+    }),
 });
