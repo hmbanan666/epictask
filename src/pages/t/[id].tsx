@@ -9,6 +9,7 @@ import {
   Grid,
   Group,
   List,
+  Progress,
   Text,
   ThemeIcon,
   Title,
@@ -19,6 +20,7 @@ import {
   IconArrowBackUp,
   IconCheck,
   IconChecklist,
+  IconCircleFilled,
   IconDeviceFloppy,
   IconEdit,
   IconSettings,
@@ -34,6 +36,35 @@ import TextEditor from '../../components/TextEditor';
 import { CoolTimeAgo } from '../../components/CoolTimeAgo';
 import { CoolModal } from '../../components/CoolModal';
 import { CoolDatePicker } from '../../components/CoolDatePicker';
+
+const TextAnalysisBlock = ({ id }: { id: string }) => {
+  const { data } = api.task.analyzeText.useQuery({ id });
+
+  const sections = data?.experiencesWithPercents;
+
+  return (
+    <div>
+      <Progress radius="xl" size={6} sections={sections} />
+
+      <Group mt={14} spacing={6}>
+        {sections?.map((section) => (
+          <UnstyledButton key={section.title} mr={10}>
+            <Group spacing={6} align="baseline">
+              <IconCircleFilled
+                size={8}
+                style={{ color: section.color, verticalAlign: 'top' }}
+              />
+              <Text size={16}>{section.title}</Text>
+              <Text size={10} color="gray">
+                {section.value}%
+              </Text>
+            </Group>
+          </UnstyledButton>
+        ))}
+      </Group>
+    </div>
+  );
+};
 
 const EditingTaskBlock = ({
   task,
@@ -177,6 +208,25 @@ const TaskPage = () => {
     taskDataMutation.mutate({ id, deadlineAt });
   };
 
+  const handleClickMarkTaskCompleted = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    showNotification({
+      id: 'update-task-data',
+      loading: true,
+      title: 'Обновляем данные Задачи...',
+      message: 'Данные побежали на сервер, база зашуршала',
+      color: 'blue',
+      autoClose: false,
+      disallowClose: true,
+    });
+
+    setIsEditingData(false);
+    taskDataMutation.mutate({ id, isCompleted: true });
+  };
+
   const AuthorTaskBlock = () => {
     const handleClickStartEditing = () => {
       setIsEditing((prev) => !prev);
@@ -219,7 +269,7 @@ const TaskPage = () => {
               onClick={handleClickStartEditing}
               leftIcon={<IconEdit size={20} />}
             >
-              Начать редактирование
+              Редактировать текст
             </Button>
           )}
         </Group>
@@ -248,7 +298,7 @@ const TaskPage = () => {
     <>
       <Head>
         <title>
-          {task.title} | Задача в Эпике {task.epicId}
+          {task.title} | Задача в Эпике &quot;{epic?.title}&quot;
         </title>
       </Head>
 
@@ -287,7 +337,29 @@ const TaskPage = () => {
 
               <List listStyleType="none" spacing={14}>
                 <List.Item>
-                  <b>В Эпике:</b>{' '}
+                  <b>Создана:</b>
+                  <div>
+                    <CoolTimeAgo date={task.createdAt} />
+                  </div>
+                </List.Item>
+                {task?.deadlineAt && !task?.completedAt && (
+                  <List.Item>
+                    <b>Дедлайн:</b>
+                    <div>
+                      <CoolTimeAgo date={task.deadlineAt} />
+                    </div>
+                  </List.Item>
+                )}
+                {task?.completedAt && (
+                  <List.Item>
+                    <b>Выполнена:</b>
+                    <div>
+                      <CoolTimeAgo date={task.completedAt} />
+                    </div>
+                  </List.Item>
+                )}
+                <List.Item>
+                  <b>Часть Эпика:</b>{' '}
                   <div>
                     <Link href={`/e/${task.epicId}`}>
                       <UnstyledButton className={classes.epicButton}>
@@ -307,28 +379,6 @@ const TaskPage = () => {
                   </div>
                 </List.Item>
                 <List.Item>
-                  <b>Создана:</b>
-                  <div>
-                    <CoolTimeAgo date={task.createdAt} />
-                  </div>
-                </List.Item>
-                {task?.deadlineAt && (
-                  <List.Item>
-                    <b>Дедлайн:</b>
-                    <div>
-                      <CoolTimeAgo date={task.deadlineAt} />
-                    </div>
-                  </List.Item>
-                )}
-                {task?.completedAt && (
-                  <List.Item>
-                    <b>Выполнена:</b>
-                    <div>
-                      <CoolTimeAgo date={task.completedAt} />
-                    </div>
-                  </List.Item>
-                )}
-                <List.Item>
                   <b>Автор:</b>{' '}
                   <div>
                     <Link href={`/u/${author?.username || ''}`}>
@@ -345,7 +395,7 @@ const TaskPage = () => {
                 </List.Item>
                 <List.Item>
                   <b>Опыт:</b>
-                  <div>TypeScript, React, Next.js, Docker, tRPC, Node.js</div>
+                  <TextAnalysisBlock id={task?.id} />
                 </List.Item>
               </List>
             </Card>
@@ -367,14 +417,27 @@ const TaskPage = () => {
             onChange={setDeadlineAt}
           />
 
-          <Button
-            type="submit"
-            onClick={(e) => handleClickSaveData(e)}
-            className={classes.commonButton}
-            leftIcon={<IconDeviceFloppy size={20} />}
-          >
-            Сохранить данные
-          </Button>
+          <Group>
+            {!task?.completedAt && (
+              <Button
+                type="submit"
+                onClick={(e) => handleClickMarkTaskCompleted(e)}
+                className={classes.commonButton}
+                leftIcon={<IconCheck size={20} />}
+              >
+                Задача выполнена!
+              </Button>
+            )}
+
+            <Button
+              type="submit"
+              onClick={(e) => handleClickSaveData(e)}
+              className={classes.commonButton}
+              leftIcon={<IconDeviceFloppy size={20} />}
+            >
+              Сохранить данные
+            </Button>
+          </Group>
         </form>
       </CoolModal>
     </>

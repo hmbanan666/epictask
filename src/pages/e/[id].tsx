@@ -198,7 +198,7 @@ const EpicPage: NextPage = () => {
               onClick={handleClickStartEditing}
               leftIcon={<IconEdit size={20} />}
             >
-              Начать редактирование
+              Редактировать текст
             </Button>
           )}
         </Group>
