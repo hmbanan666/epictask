@@ -11,25 +11,31 @@ import {
   List,
   Text,
   ThemeIcon,
+  Timeline,
   Title,
   UnstyledButton,
 } from '@mantine/core';
 import Head from 'next/head';
 import Link from 'next/link';
 import {
+  IconArrowBackUp,
   IconBrandGithub,
   IconCheck,
+  IconDeviceFloppy,
+  IconEdit,
   IconExternalLink,
+  IconFileArrowRight,
+  IconHourglassHigh,
 } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { type Epic } from '@prisma/client';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
 import { api } from '../../utils/api';
-import { localTime } from '../../utils/date';
 import TextEditor from '../../components/TextEditor';
+import { CoolTimeAgo } from '../../components/CoolTimeAgo';
 
 const EditingEpicBlock = ({
   epic,
@@ -143,6 +149,9 @@ const EpicPage: NextPage = () => {
   const author = epicData?.author;
   const tasks = epicData?.tasks;
 
+  const tasksInProgress = tasks?.filter((task) => !task?.completedAt);
+  const completedTasks = tasks?.filter((task) => task?.completedAt);
+
   const isAuthor = session?.user?.id === author?.id;
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -171,12 +180,14 @@ const EpicPage: NextPage = () => {
               <Button
                 className={classes.commonButton}
                 onClick={handleClickStopEditingAndSave}
+                leftIcon={<IconDeviceFloppy size={20} />}
               >
                 Закончить редактирование
               </Button>
               <Button
                 className={classes.rareButton}
                 onClick={handleClickStopEditing}
+                leftIcon={<IconArrowBackUp size={20} />}
               >
                 Отменить
               </Button>
@@ -185,6 +196,7 @@ const EpicPage: NextPage = () => {
             <Button
               className={classes.rareButton}
               onClick={handleClickStartEditing}
+              leftIcon={<IconEdit size={20} />}
             >
               Начать редактирование
             </Button>
@@ -253,11 +265,15 @@ const EpicPage: NextPage = () => {
               <List listStyleType="none" spacing={14}>
                 <List.Item>
                   <b>Создан:</b>
-                  <div>{localTime(epic?.createdAt, true)}</div>
+                  <div>
+                    <CoolTimeAgo date={epic?.createdAt} />
+                  </div>
                 </List.Item>
                 <List.Item>
                   <b>Дедлайн:</b>
-                  <div>{localTime(epic?.deadlineAt, true)}</div>
+                  <div>
+                    <CoolTimeAgo date={epic?.deadlineAt} />
+                  </div>
                 </List.Item>
                 <List.Item>
                   <b>Платформа:</b>
@@ -336,38 +352,81 @@ const EpicPage: NextPage = () => {
           </Grid.Col>
         </Grid>
 
-        <Title order={2} style={{ marginTop: 20, marginBottom: 10 }}>
-          Выполненные Задачи
-        </Title>
-        <Grid>
-          {tasks?.map((task) => (
-            <Grid.Col key={task.id} md={6}>
-              <Card p="lg" className={classes.coolCard}>
-                <Group position="apart" mt="xs" mb="xs">
-                  <Text weight={500}>{task.title}</Text>
-                </Group>
-
-                <Text size="sm" color="dimmed">
-                  {task.description}
-                </Text>
-
-                <Box mt={20}>
-                  <Link
-                    href={`/t/${task.id}`}
-                    style={{ textDecoration: 'none' }}
+        {tasksInProgress && tasksInProgress.length > 0 && (
+          <>
+            <Title order={2} style={{ marginTop: 20, marginBottom: 10 }}>
+              Задачи в процессе
+            </Title>
+            <Box mt={25} mb={40}>
+              <Timeline bulletSize={24}>
+                {tasksInProgress?.map((task) => (
+                  <Timeline.Item
+                    key={task.id}
+                    title={task.title}
+                    bullet={<IconHourglassHigh size={14} />}
                   >
-                    <UnstyledButton
-                      className={classes.commonButton}
-                      style={{ minWidth: '100%', textAlign: 'center' }}
+                    <Text color="dimmed" size="xs" mt={4}>
+                      <CoolTimeAgo date={task.createdAt} />
+                    </Text>
+                    <Text color="dimmed" size={15} mb={8}>
+                      {task.description}
+                    </Text>
+
+                    <Link
+                      href={`/t/${task.id}`}
+                      style={{ textDecoration: 'none' }}
                     >
-                      Открыть эту Задачу
-                    </UnstyledButton>
-                  </Link>
-                </Box>
-              </Card>
-            </Grid.Col>
-          ))}
-        </Grid>
+                      <Button
+                        className={classes.rareButton}
+                        leftIcon={<IconFileArrowRight size={20} />}
+                      >
+                        Открыть
+                      </Button>
+                    </Link>
+                  </Timeline.Item>
+                ))}
+              </Timeline>
+            </Box>
+          </>
+        )}
+
+        {completedTasks && completedTasks.length > 0 && (
+          <>
+            <Title order={2} style={{ marginTop: 20, marginBottom: 10 }}>
+              Выполненные Задачи
+            </Title>
+            <Box mt={25} mb={40}>
+              <Timeline bulletSize={24}>
+                {completedTasks?.map((task) => (
+                  <Timeline.Item
+                    key={task.id}
+                    title={task.title}
+                    bullet={<IconCheck size={14} />}
+                  >
+                    <Text color="dimmed" size="xs" mt={4}>
+                      <CoolTimeAgo date={task.completedAt} />
+                    </Text>
+                    <Text color="dimmed" size={15} mb={8}>
+                      {task.description}
+                    </Text>
+
+                    <Link
+                      href={`/t/${task.id}`}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <Button
+                        className={classes.commonButton}
+                        leftIcon={<IconFileArrowRight size={20} />}
+                      >
+                        Открыть
+                      </Button>
+                    </Link>
+                  </Timeline.Item>
+                ))}
+              </Timeline>
+            </Box>
+          </>
+        )}
       </Container>
 
       <Footer />

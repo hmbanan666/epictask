@@ -15,16 +15,25 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import Link from 'next/link';
-import { IconCheck, IconChecklist } from '@tabler/icons-react';
+import {
+  IconArrowBackUp,
+  IconCheck,
+  IconChecklist,
+  IconDeviceFloppy,
+  IconEdit,
+  IconSettings,
+} from '@tabler/icons-react';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { type Task } from '@prisma/client';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { globalStyles } from '../../utils/styles';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
-import { localTime } from '../../utils/date';
 import TextEditor from '../../components/TextEditor';
+import { CoolTimeAgo } from '../../components/CoolTimeAgo';
+import { CoolModal } from '../../components/CoolModal';
+import { CoolDatePicker } from '../../components/CoolDatePicker';
 
 const EditingTaskBlock = ({
   task,
@@ -113,8 +122,8 @@ const EditingTaskBlock = ({
 
 const TaskPage = () => {
   const { classes } = globalStyles();
-  const { query } = useRouter();
-  const id = query.id as string;
+  const router = useRouter();
+  const id = router.query.id as string;
 
   const { data: session } = useSession();
 
@@ -129,6 +138,44 @@ const TaskPage = () => {
   const isAuthor = session?.user?.id === task?.authorId;
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  const [isEditingData, setIsEditingData] = useState(false);
+  const [deadlineAt, setDeadlineAt] = useState<Date | null>(
+    task?.deadlineAt || null
+  );
+
+  const taskDataMutation = api.task.updateData.useMutation({
+    onSuccess: () => {
+      void taskDataRefetch();
+      updateNotification({
+        id: 'update-task-data',
+        color: 'green',
+        title: 'Задача успешно обновлена!',
+        message: 'Все хорошо. Сейчас обновим данные на странице',
+        icon: <IconCheck size={16} />,
+        autoClose: 2500,
+      });
+    },
+  });
+
+  const handleClickSaveData = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    showNotification({
+      id: 'update-task-data',
+      loading: true,
+      title: 'Обновляем данные Задачи...',
+      message: 'Данные побежали на сервер, база зашуршала',
+      color: 'blue',
+      autoClose: false,
+      disallowClose: true,
+    });
+
+    setIsEditingData(false);
+    taskDataMutation.mutate({ id, deadlineAt });
+  };
 
   const AuthorTaskBlock = () => {
     const handleClickStartEditing = () => {
@@ -154,12 +201,14 @@ const TaskPage = () => {
               <Button
                 className={classes.commonButton}
                 onClick={handleClickStopEditingAndSave}
+                leftIcon={<IconDeviceFloppy size={20} />}
               >
                 Закончить редактирование
               </Button>
               <Button
                 className={classes.rareButton}
                 onClick={handleClickStopEditing}
+                leftIcon={<IconArrowBackUp size={20} />}
               >
                 Отменить
               </Button>
@@ -168,6 +217,7 @@ const TaskPage = () => {
             <Button
               className={classes.rareButton}
               onClick={handleClickStartEditing}
+              leftIcon={<IconEdit size={20} />}
             >
               Начать редактирование
             </Button>
@@ -220,6 +270,18 @@ const TaskPage = () => {
 
           <Grid.Col md={4}>
             <Card p="lg" className={classes.coolCard}>
+              {isAuthor && (
+                <Box mb={15}>
+                  <Button
+                    className={classes.rareButton}
+                    onClick={() => setIsEditingData(true)}
+                    leftIcon={<IconSettings size={20} />}
+                  >
+                    Редактировать данные
+                  </Button>
+                </Box>
+              )}
+
               <Title order={3}>Задача</Title>
               <Text mb={10}>{task.id}</Text>
 
@@ -246,12 +308,26 @@ const TaskPage = () => {
                 </List.Item>
                 <List.Item>
                   <b>Создана:</b>
-                  <div>{localTime(task.createdAt, true)}</div>
+                  <div>
+                    <CoolTimeAgo date={task.createdAt} />
+                  </div>
                 </List.Item>
-                <List.Item>
-                  <b>Выполнена:</b>
-                  <div>{localTime(task.completedAt, true)}</div>
-                </List.Item>
+                {task?.deadlineAt && (
+                  <List.Item>
+                    <b>Дедлайн:</b>
+                    <div>
+                      <CoolTimeAgo date={task.deadlineAt} />
+                    </div>
+                  </List.Item>
+                )}
+                {task?.completedAt && (
+                  <List.Item>
+                    <b>Выполнена:</b>
+                    <div>
+                      <CoolTimeAgo date={task.completedAt} />
+                    </div>
+                  </List.Item>
+                )}
                 <List.Item>
                   <b>Автор:</b>{' '}
                   <div>
@@ -278,6 +354,29 @@ const TaskPage = () => {
       </Container>
 
       <Footer />
+
+      <CoolModal
+        title="Данные задачи"
+        opened={isEditingData}
+        onClose={() => setIsEditingData(false)}
+      >
+        <form>
+          <CoolDatePicker
+            label="Дата дедлайна"
+            value={deadlineAt}
+            onChange={setDeadlineAt}
+          />
+
+          <Button
+            type="submit"
+            onClick={(e) => handleClickSaveData(e)}
+            className={classes.commonButton}
+            leftIcon={<IconDeviceFloppy size={20} />}
+          >
+            Сохранить данные
+          </Button>
+        </form>
+      </CoolModal>
     </>
   );
 };

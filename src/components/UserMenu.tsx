@@ -9,6 +9,7 @@ import {
 } from '@mantine/core';
 import {
   IconCheck,
+  IconFilePlus,
   IconLogout,
   IconPencilPlus,
   IconUserCircle,
@@ -232,6 +233,7 @@ export const UserMenu = () => {
             type="submit"
             onClick={(e) => handleClickAddNewTask(e)}
             className={classes.rareButton}
+            leftIcon={<IconFilePlus size={20} />}
           >
             Создать Задачу
           </Button>
