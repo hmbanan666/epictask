@@ -57,6 +57,33 @@ export const globalStyles = createStyles((theme) => ({
       backgroundColor: theme.colors.green[6],
     },
   },
+  likeButton: {
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    fontSize: 16,
+    fontWeight: 700,
+    borderRadius: 14,
+    minHeight: 48,
+    color: '#fff',
+    backgroundColor: theme.colors.red[5],
+
+    '&:hover': {
+      backgroundColor: theme.colors.red[6],
+    },
+  },
+  statInfoElement: {
+    paddingTop: 14,
+    paddingBottom: 14,
+    paddingLeft: 20,
+    paddingRight: 20,
+    fontSize: 15,
+    fontWeight: 600,
+    borderRadius: 14,
+    color: theme.colors.dark[3],
+    backgroundColor: theme.colors.gray[0],
+  },
   coolCard: {
     backgroundColor: theme.colors.gray[0],
     borderRadius: theme.radius.lg,

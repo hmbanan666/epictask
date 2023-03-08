@@ -68,6 +68,15 @@ model TaskAssignment {
   task      Task     @relation(fields: [taskId], references: [id])
 }
 
+model Experience {
+  id          String   @id @default(cuid())
+  title       String   @unique
+  description String?
+  aliases     String[]
+  color       String   @default("#000000")
+  createdAt   DateTime @default(now())
+}
+
 // Necessary for Next auth
 model Account {
   id                       String  @id @default(cuid())

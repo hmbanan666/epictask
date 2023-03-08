@@ -24,6 +24,7 @@ import {
   IconDeviceFloppy,
   IconEdit,
   IconSettings,
+  IconThumbUp,
 } from '@tabler/icons-react';
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
@@ -46,21 +47,28 @@ const TextAnalysisBlock = ({ id }: { id: string }) => {
     <div>
       <Progress radius="xl" size={6} sections={sections} />
 
-      <Group mt={14} spacing={6}>
-        {sections?.map((section) => (
-          <UnstyledButton key={section.title} mr={10}>
-            <Group spacing={6} align="baseline">
-              <IconCircleFilled
-                size={8}
-                style={{ color: section.color, verticalAlign: 'top' }}
-              />
-              <Text size={16}>{section.title}</Text>
-              <Text size={10} color="gray">
-                {section.value}%
-              </Text>
-            </Group>
-          </UnstyledButton>
-        ))}
+      <Group mt={12} spacing={6}>
+        {sections?.map((section) => {
+          const count = data?.experiencesCounted[section.title];
+
+          return (
+            <UnstyledButton key={section.title} mr={10}>
+              <Group spacing={6} align="baseline">
+                <IconCircleFilled
+                  size={8}
+                  style={{ color: section.color, verticalAlign: 'top' }}
+                />
+                <Text size={16}>{section.title}</Text>
+                <Text size={10} color="gray">
+                  x{count}
+                </Text>
+                <Text size={10} color="gray">
+                  {section.value}%
+                </Text>
+              </Group>
+            </UnstyledButton>
+          );
+        })}
       </Group>
     </div>
   );
@@ -311,10 +319,34 @@ const TaskPage = () => {
 
         <Grid>
           <Grid.Col md={8}>
+            <Box style={{ marginBottom: 20 }}>
+              <Group spacing={8}>
+                <Text className={classes.statInfoElement}>?? лайков</Text>
+                <Text className={classes.statInfoElement}>?? просмотров</Text>
+                <Text className={classes.statInfoElement}>??? символов</Text>
+              </Group>
+            </Box>
+
             <Box style={{ marginBottom: 40 }}>
               <p>{task.description}</p>
 
               <div dangerouslySetInnerHTML={{ __html: task?.text || '' }} />
+            </Box>
+
+            <Box style={{ marginBottom: 40 }}>
+              <Card p="xl" className={classes.coolCard}>
+                <Title order={3}>Понравился материал?</Title>
+                <Text mb={12}>Поставь лайк, чтобы автор получил Опыт!</Text>
+
+                <Group spacing={8}>
+                  <Button
+                    className={classes.likeButton}
+                    leftIcon={<IconThumbUp />}
+                  >
+                    Ставлю лайк!
+                  </Button>
+                </Group>
+              </Card>
             </Box>
           </Grid.Col>
 
