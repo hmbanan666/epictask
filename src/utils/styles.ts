@@ -23,7 +23,7 @@ export const globalStyles = createStyles((theme) => ({
     backgroundColor: theme.colors.violet[4],
 
     '&:hover': {
-      backgroundColor: theme.colors.violet[5],
+      backgroundColor: `${theme.colors.violet[5]} !important`,
     },
   },
   rareButton: {
@@ -39,7 +39,7 @@ export const globalStyles = createStyles((theme) => ({
     backgroundColor: theme.colors.blue[4],
 
     '&:hover': {
-      backgroundColor: theme.colors.blue[5],
+      backgroundColor: `${theme.colors.blue[5]} !important`,
     },
   },
   commonButton: {
@@ -55,7 +55,7 @@ export const globalStyles = createStyles((theme) => ({
     backgroundColor: theme.colors.green[5],
 
     '&:hover': {
-      backgroundColor: theme.colors.green[6],
+      backgroundColor: `${theme.colors.green[6]} !important`,
     },
   },
   likeButton: {
@@ -71,7 +71,7 @@ export const globalStyles = createStyles((theme) => ({
     backgroundColor: theme.colors.red[5],
 
     '&:hover': {
-      backgroundColor: theme.colors.red[6],
+      backgroundColor: `${theme.colors.red[6]} !important`,
     },
   },
   statInfoElement: {

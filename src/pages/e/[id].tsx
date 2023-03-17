@@ -30,7 +30,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { type Epic } from '@prisma/client';
-import { showNotification, updateNotification } from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
 import { api } from '../../utils/api';
@@ -62,7 +62,8 @@ const EditingEpicBlock = ({
   const epicMutation = api.epic.update.useMutation({
     onSuccess: () => {
       dataRefetch();
-      updateNotification({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+      notifications.update({
         id: 'update-epic',
         color: 'teal',
         title: 'Эпик успешно обновлен!',
@@ -76,14 +77,15 @@ const EditingEpicBlock = ({
   useEffect(() => {
     if (!isSaving || !epic?.id) return;
 
-    showNotification({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    notifications.show({
       id: 'update-epic',
       loading: true,
       title: 'Обновляем Эпик...',
       message: 'Данные побежали на сервер, база зашуршала',
       color: 'blue',
       autoClose: false,
-      disallowClose: true,
+      withCloseButton: false,
     });
 
     epicMutation.mutate({

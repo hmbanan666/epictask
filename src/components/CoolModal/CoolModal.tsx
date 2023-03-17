@@ -16,19 +16,15 @@ export const CoolModal = ({
 
   return (
     <Modal
-      classNames={{
-        root: classes.root,
-        modal: classes.modal,
-        header: classes.header,
-        title: classes.title,
-        close: classes.close,
-      }}
+      classNames={classes}
       size={550}
       opened={opened}
       onClose={() => onClose(false)}
       title={title}
-      overlayColor={theme.colors.dark[4]}
-      overlayOpacity={0.5}
+      overlayProps={{
+        color: theme.colors.dark[4],
+        opacity: 0.5,
+      }}
     >
       {children}
     </Modal>

@@ -1,6 +1,7 @@
-import { DatePicker } from '@mantine/dates';
+import { DatePickerInput } from '@mantine/dates';
 import React from 'react';
 import 'dayjs/locale/ru';
+import { Box } from '@mantine/core';
 import useStyles from './CoolDatePicker.styles';
 
 export const CoolDatePicker = (props: {
@@ -11,13 +12,21 @@ export const CoolDatePicker = (props: {
   const { classes } = useStyles();
 
   return (
-    <DatePicker
-      label={props.label}
-      value={props.value}
-      onChange={props.onChange}
-      classNames={classes}
-      locale="ru"
-      placeholder="Выберите дату"
-    />
+    <Box>
+      <DatePickerInput
+        label={props.label}
+        value={props.value}
+        onChange={props.onChange}
+        dropdownType="modal"
+        classNames={{
+          root: classes.root,
+          wrapper: classes.wrapper,
+          input: classes.input,
+          label: classes.label,
+        }}
+        locale="ru"
+        placeholder="Выберите дату"
+      />
+    </Box>
   );
 };

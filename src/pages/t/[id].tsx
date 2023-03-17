@@ -29,7 +29,7 @@ import {
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { type Task } from '@prisma/client';
-import { showNotification, updateNotification } from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import { globalStyles } from '../../utils/styles';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
@@ -96,7 +96,8 @@ const EditingTaskBlock = ({
   const taskMutation = api.task.update.useMutation({
     onSuccess: () => {
       dataRefetch();
-      updateNotification({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+      notifications.update({
         id: 'update-task',
         color: 'green',
         title: 'Задача успешно обновлена!',
@@ -110,14 +111,15 @@ const EditingTaskBlock = ({
   useEffect(() => {
     if (!isSaving || !task?.id) return;
 
-    showNotification({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    notifications.show({
       id: 'update-task',
       loading: true,
       title: 'Обновляем Задачу...',
       message: 'Данные побежали на сервер, база зашуршала',
       color: 'blue',
       autoClose: false,
-      disallowClose: true,
+      withCloseButton: false,
     });
 
     taskMutation.mutate({
@@ -186,7 +188,8 @@ const TaskPage = () => {
   const taskDataMutation = api.task.updateData.useMutation({
     onSuccess: () => {
       void taskDataRefetch();
-      updateNotification({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+      notifications.update({
         id: 'update-task-data',
         color: 'green',
         title: 'Задача успешно обновлена!',
@@ -202,14 +205,15 @@ const TaskPage = () => {
   ) => {
     e.preventDefault();
 
-    showNotification({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    notifications.show({
       id: 'update-task-data',
       loading: true,
       title: 'Обновляем данные Задачи...',
       message: 'Данные побежали на сервер, база зашуршала',
       color: 'blue',
       autoClose: false,
-      disallowClose: true,
+      withCloseButton: false,
     });
 
     setIsEditingData(false);
@@ -221,14 +225,15 @@ const TaskPage = () => {
   ) => {
     e.preventDefault();
 
-    showNotification({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    notifications.show({
       id: 'update-task-data',
       loading: true,
       title: 'Обновляем данные Задачи...',
       message: 'Данные побежали на сервер, база зашуршала',
       color: 'blue',
       autoClose: false,
-      disallowClose: true,
+      withCloseButton: false,
     });
 
     setIsEditingData(false);
@@ -283,6 +288,15 @@ const TaskPage = () => {
         </Group>
       </Card>
     );
+  };
+
+  const handleClickLikeButton = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    notifications.show({
+      title: 'Спасибо за ваш Лайк!',
+      message: 'Он пока не поставился. Скоро будет реализация этой фичи.',
+      withCloseButton: false,
+    });
   };
 
   if (!task) return null;
@@ -342,6 +356,7 @@ const TaskPage = () => {
                   <Button
                     className={classes.likeButton}
                     leftIcon={<IconThumbUp />}
+                    onClick={handleClickLikeButton}
                   >
                     Ставлю лайк!
                   </Button>
@@ -404,7 +419,7 @@ const TaskPage = () => {
                           >
                             <IconChecklist size={20} />
                           </ThemeIcon>
-                          <Text>{epic?.title}</Text>
+                          <Text align="left">{epic?.title}</Text>
                         </Group>
                       </UnstyledButton>
                     </Link>

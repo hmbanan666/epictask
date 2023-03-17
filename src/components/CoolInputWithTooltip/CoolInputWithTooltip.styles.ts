@@ -35,7 +35,7 @@ export default createStyles((theme) => ({
     pointerEvents: 'none',
     fontSize: theme.fontSizes.xs,
     paddingLeft: theme.spacing.md,
-    paddingTop: theme.spacing.sm / 2,
+    paddingTop: theme.spacing.sm ?? 1 / 2,
     zIndex: 1,
   },
   icon: {

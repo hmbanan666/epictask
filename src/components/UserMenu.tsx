@@ -17,7 +17,7 @@ import {
 import { signOut, useSession } from 'next-auth/react';
 import React from 'react';
 import Link from 'next/link';
-import { showNotification, updateNotification } from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/router';
 import { globalStyles } from '../utils/styles';
 import { CoolModal } from './CoolModal';
@@ -44,7 +44,8 @@ export const UserMenu = () => {
     onSuccess: (data) => {
       if (!data?.id) return;
 
-      updateNotification({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+      notifications.update({
         id: 'create-task',
         color: 'green',
         title: 'Задача успешно создана!',
@@ -63,14 +64,16 @@ export const UserMenu = () => {
     if (!title || !description) return;
 
     e.preventDefault();
-    showNotification({
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    notifications.show({
       id: 'create-task',
       loading: true,
       title: 'Создаем Задачу...',
       message: 'Данные побежали на сервер, база зашуршала',
       color: 'blue',
       autoClose: false,
-      disallowClose: true,
+      withCloseButton: false,
     });
 
     setIsNewTaskModalOpen(false);
@@ -90,8 +93,7 @@ export const UserMenu = () => {
             <Indicator
               label={0}
               size={20}
-              showZero={false}
-              dot={false}
+              disabled
               color="red"
               withBorder
               offset={3}

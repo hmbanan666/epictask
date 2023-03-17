@@ -1,13 +1,12 @@
 import { createStyles } from '@mantine/core';
 
 export default createStyles((theme) => ({
-  root: {},
-  modal: {
-    padding: '30px 30px !important',
+  content: {
+    padding: '15px 15px !important',
     borderRadius: 16,
   },
   header: {
-    marginBottom: 34,
+    marginBottom: 22,
   },
   title: {
     fontSize: 28,
@@ -17,9 +16,11 @@ export default createStyles((theme) => ({
   },
   close: {
     color: theme.colors.dark[4],
+    width: 40,
+    height: 40,
     svg: {
-      width: 24,
-      height: 24,
+      width: 30,
+      height: 30,
     },
   },
 }));

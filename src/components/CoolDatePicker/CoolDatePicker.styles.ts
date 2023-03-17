@@ -7,7 +7,8 @@ export default createStyles((theme) => ({
   },
   input: {
     height: 'auto',
-    paddingTop: 20,
+    paddingTop: 26,
+    paddingBottom: 5,
     paddingLeft: theme.spacing.md,
     paddingRight: theme.spacing.md,
     borderRadius: 14,
@@ -35,26 +36,11 @@ export default createStyles((theme) => ({
     pointerEvents: 'none',
     fontSize: theme.fontSizes.xs,
     paddingLeft: theme.spacing.md,
-    paddingTop: theme.spacing.sm / 2,
+    paddingTop: theme.spacing.sm ?? 1 / 2,
     zIndex: 1,
   },
   icon: {
     paddingTop: 18,
     color: theme.colors.gray[5],
-  },
-  dropdown: {
-    borderRadius: 14,
-  },
-  item: {
-    borderRadius: 14,
-    paddingTop: theme.spacing.xs,
-    paddingBottom: theme.spacing.xs,
-
-    '&[data-selected]': {
-      '&, &:hover': {
-        backgroundColor: theme.colors.violet[1],
-        color: theme.colors.violet[5],
-      },
-    },
   },
 }));

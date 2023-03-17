@@ -3,7 +3,7 @@ import { type Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import { AppShell, MantineProvider } from '@mantine/core';
 import Head from 'next/head';
-import { NotificationsProvider } from '@mantine/notifications';
+import { Notifications } from '@mantine/notifications';
 import { api } from '../utils/api';
 import { MyHeader } from '../components/MyHeader';
 import { RouterTransition } from '../components/RouterTransition';
@@ -50,12 +50,11 @@ const MyApp: AppType<{ session: Session | null }> = ({
           }),
         }}
       >
-        <NotificationsProvider position="top-center">
-          <AppShell header={<MyHeader />}>
-            <RouterTransition />
-            <Component {...pageProps} />
-          </AppShell>
-        </NotificationsProvider>
+        <Notifications position="top-center" />
+        <AppShell header={<MyHeader />}>
+          <RouterTransition />
+          <Component {...pageProps} />
+        </AppShell>
       </MantineProvider>
     </SessionProvider>
   </>

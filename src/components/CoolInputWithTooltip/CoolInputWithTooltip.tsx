@@ -7,9 +7,7 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
-import { TimeRangeInput } from '@mantine/dates';
 import type { SelectItem } from '@mantine/core/lib/Select/types';
-import { IconClock } from '@tabler/icons-react';
 import useStyles from './CoolInputWithTooltip.styles';
 
 function TooltipBlock(props: {
@@ -38,12 +36,11 @@ function TooltipBlock(props: {
 
 export function CoolInputWithTooltip(props: {
   label: string;
-  type?: 'input' | 'textarea' | 'select' | 'multiSelect' | 'timeRange';
+  type?: 'input' | 'textarea' | 'select' | 'multiSelect';
   value?: string | number;
   placeholder?: string;
   selectData?: SelectItem[];
   selectValue?: string[];
-  timeData?: [Date, Date];
   required?: boolean;
   maxLength?: number;
   onChange?: (value: string) => void;
@@ -147,17 +144,6 @@ export function CoolInputWithTooltip(props: {
               paddingBottom: 5,
             },
           }}
-        />
-      )}
-      {type === 'timeRange' && (
-        <TimeRangeInput
-          label={props.label}
-          value={props.timeData}
-          classNames={classes}
-          icon={<IconClock size={16} />}
-          size="md"
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
         />
       )}
     </>
