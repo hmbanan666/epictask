@@ -53,7 +53,7 @@ const HomePage: NextPage = () => {
           </ul>
         </div>
 
-        <div style={{ marginTop: 80 }}>
+        <Box mt={80}>
           <Title order={2} mb={20}>
             Новые Эпики
           </Title>
@@ -73,14 +73,8 @@ const HomePage: NextPage = () => {
                   </Text>
 
                   <Box mt={20}>
-                    <Link
-                      href={`/e/${epic.id}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <UnstyledButton
-                        className={classes.epicButton}
-                        style={{ minWidth: '100%', textAlign: 'center' }}
-                      >
+                    <Link href={`/e/${epic.id}`}>
+                      <UnstyledButton className={classes.epicButton} w="100%">
                         Открыть этот Эпик
                       </UnstyledButton>
                     </Link>
@@ -89,7 +83,7 @@ const HomePage: NextPage = () => {
               </Grid.Col>
             ))}
           </Grid>
-        </div>
+        </Box>
       </Container>
 
       <Footer />

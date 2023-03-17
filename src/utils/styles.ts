@@ -14,6 +14,7 @@ export const globalStyles = createStyles((theme) => ({
     paddingBottom: 6,
     paddingLeft: 10,
     paddingRight: 10,
+    textAlign: 'center',
     fontSize: 15,
     fontWeight: 700,
     borderRadius: 14,
