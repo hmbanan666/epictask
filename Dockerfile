@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-FROM base AS builder
+FROM node:18.15-alpine AS builder
 
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV SKIP_ENV_VALIDATION 1
@@ -16,7 +16,7 @@ COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-FROM builder AS production
+FROM node:18.15-alpine AS production
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
