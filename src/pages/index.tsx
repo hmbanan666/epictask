@@ -1,5 +1,4 @@
 import React from 'react';
-import { type NextPage } from 'next';
 import {
   Badge,
   Box,
@@ -15,12 +14,16 @@ import Link from 'next/link';
 import { type Epic } from '@prisma/client';
 import { Footer } from '../components/Footer';
 import { globalStyles } from '../utils/styles';
-import { api } from '../utils/api';
+import { prisma } from '../server/db';
 
-const HomePage: NextPage = () => {
+export const getServerSideProps = async () => {
+  const epics = await prisma.epic.findMany();
+
+  return { props: { epics } };
+};
+
+export default function HomePage({ epics }: { epics: Epic[] }) {
   const { classes } = globalStyles();
-
-  const { data: epics } = api.epic.findMany.useQuery();
 
   return (
     <>
@@ -89,6 +92,4 @@ const HomePage: NextPage = () => {
       <Footer />
     </>
   );
-};
-
-export default HomePage;
+}
