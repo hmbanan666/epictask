@@ -1,5 +1,3 @@
-import { type NextPage } from 'next';
-import { useRouter } from 'next/router';
 import {
   Avatar,
   Box,
@@ -28,25 +26,116 @@ import {
   IconHourglassHigh,
 } from '@tabler/icons-react';
 import React, { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { type Epic } from '@prisma/client';
+import { type Epic, type Task, type User } from '@prisma/client';
 import { notifications } from '@mantine/notifications';
+import {
+  type GetServerSideProps,
+  type InferGetServerSidePropsType,
+} from 'next';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
 import { api } from '../../utils/api';
 import TextEditor from '../../components/TextEditor';
 import { CoolTimeAgo } from '../../components/CoolTimeAgo';
+import { prisma } from '../../server/db';
+import { getServerAuthSession } from '../../server/auth';
+
+export const getServerSideProps: GetServerSideProps<{
+  epic: Epic;
+  author: User;
+  isAuthor: boolean;
+  tasksInProgress: Task[];
+  tasksCompleted: Task[];
+}> = async ({ params, req, res }) => {
+  const epicId = params?.id as string;
+  const epic = await prisma.epic.findUnique({
+    where: { id: epicId },
+    include: {
+      user: true,
+      task: {
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
+  });
+
+  // 404 if no epic found
+  if (!epic) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const author = epic?.user;
+  const tasksInProgress = epic?.task.filter((task) => !task?.completedAt);
+  const tasksCompleted = epic?.task.filter((task) => task?.completedAt);
+
+  const session = await getServerAuthSession({ req, res });
+  const isAuthor = session?.user?.id === author?.id;
+
+  return {
+    props: {
+      epic,
+      author,
+      isAuthor,
+      tasksInProgress,
+      tasksCompleted,
+    },
+  };
+};
+
+const TasksBlock = ({
+  tasks,
+  title,
+  bulletIcon,
+}: {
+  tasks: Task[];
+  title: string;
+  bulletIcon: JSX.Element;
+}) => {
+  const { classes } = globalStyles();
+
+  return (
+    <>
+      <Title order={2} style={{ marginTop: 20, marginBottom: 10 }}>
+        {title}
+      </Title>
+      <Box mt={25} mb={40}>
+        <Timeline bulletSize={24}>
+          {tasks?.map((task) => (
+            <Timeline.Item key={task.id} title={task.title} bullet={bulletIcon}>
+              <Text color="dimmed" size="xs" mt={4}>
+                <CoolTimeAgo date={task.createdAt} />
+              </Text>
+              <Text color="dimmed" size={15} mb={8}>
+                {task.description}
+              </Text>
+
+              <Link href={`/t/${task.id}`} style={{ textDecoration: 'none' }}>
+                <Button
+                  className={classes.rareButton}
+                  leftIcon={<IconFileArrowRight size={20} />}
+                >
+                  Открыть
+                </Button>
+              </Link>
+            </Timeline.Item>
+          ))}
+        </Timeline>
+      </Box>
+    </>
+  );
+};
 
 const EditingEpicBlock = ({
   epic,
   isSaving,
-  dataRefetch,
   setIsSaving,
   setIsEditing,
 }: {
   epic: Epic;
   isSaving: boolean;
-  dataRefetch: () => unknown;
   setIsSaving: (value: boolean) => void;
   setIsEditing: (value: boolean) => void;
 }) => {
@@ -61,7 +150,6 @@ const EditingEpicBlock = ({
 
   const epicMutation = api.epic.update.useMutation({
     onSuccess: () => {
-      dataRefetch();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       notifications.update({
         id: 'update-epic',
@@ -71,6 +159,8 @@ const EditingEpicBlock = ({
         icon: <IconCheck size={16} />,
         autoClose: 2500,
       });
+      // refresh page
+      window.location.reload();
     },
   });
 
@@ -136,25 +226,15 @@ const EditingEpicBlock = ({
   );
 };
 
-const EpicPage: NextPage = () => {
+export default function EpicPage({
+  epic,
+  author,
+  isAuthor,
+  tasksInProgress,
+  tasksCompleted,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { classes } = globalStyles();
-  const { query } = useRouter();
-  const id = query.id as string;
 
-  const { data: session } = useSession();
-
-  const { data: epicData, refetch: epicDataRefetch } = api.epic.id.useQuery({
-    id,
-  });
-
-  const epic = epicData?.epic;
-  const author = epicData?.author;
-  const tasks = epicData?.tasks;
-
-  const tasksInProgress = tasks?.filter((task) => !task?.completedAt);
-  const completedTasks = tasks?.filter((task) => task?.completedAt);
-
-  const isAuthor = session?.user?.id === author?.id;
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -216,7 +296,6 @@ const EpicPage: NextPage = () => {
         {isAuthor && <AuthorEpicBlock />}
         <EditingEpicBlock
           epic={epic}
-          dataRefetch={epicDataRefetch}
           isSaving={isSaving}
           setIsSaving={setIsSaving}
           setIsEditing={setIsEditing}
@@ -229,7 +308,7 @@ const EpicPage: NextPage = () => {
     <>
       <Head>
         <title>
-          {epic.title} | Эпик {id}
+          {epic.title} | Эпик {epic.id}
         </title>
       </Head>
 
@@ -262,7 +341,7 @@ const EpicPage: NextPage = () => {
           <Grid.Col md={4}>
             <Card p="lg" className={classes.coolCard}>
               <Title order={3}>Эпик</Title>
-              <Text mb={10}>{id}</Text>
+              <Text mb={10}>{epic.id}</Text>
 
               <List listStyleType="none" spacing={14}>
                 <List.Item>
@@ -355,85 +434,23 @@ const EpicPage: NextPage = () => {
         </Grid>
 
         {tasksInProgress && tasksInProgress.length > 0 && (
-          <>
-            <Title order={2} style={{ marginTop: 20, marginBottom: 10 }}>
-              Задачи в процессе
-            </Title>
-            <Box mt={25} mb={40}>
-              <Timeline bulletSize={24}>
-                {tasksInProgress?.map((task) => (
-                  <Timeline.Item
-                    key={task.id}
-                    title={task.title}
-                    bullet={<IconHourglassHigh size={14} />}
-                  >
-                    <Text color="dimmed" size="xs" mt={4}>
-                      <CoolTimeAgo date={task.createdAt} />
-                    </Text>
-                    <Text color="dimmed" size={15} mb={8}>
-                      {task.description}
-                    </Text>
-
-                    <Link
-                      href={`/t/${task.id}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <Button
-                        className={classes.rareButton}
-                        leftIcon={<IconFileArrowRight size={20} />}
-                      >
-                        Открыть
-                      </Button>
-                    </Link>
-                  </Timeline.Item>
-                ))}
-              </Timeline>
-            </Box>
-          </>
+          <TasksBlock
+            tasks={tasksInProgress}
+            title="Задачи в процессе"
+            bulletIcon={<IconHourglassHigh size={14} />}
+          />
         )}
 
-        {completedTasks && completedTasks.length > 0 && (
-          <>
-            <Title order={2} style={{ marginTop: 20, marginBottom: 10 }}>
-              Выполненные Задачи
-            </Title>
-            <Box mt={25} mb={40}>
-              <Timeline bulletSize={24}>
-                {completedTasks?.map((task) => (
-                  <Timeline.Item
-                    key={task.id}
-                    title={task.title}
-                    bullet={<IconCheck size={14} />}
-                  >
-                    <Text color="dimmed" size="xs" mt={4}>
-                      <CoolTimeAgo date={task.completedAt} />
-                    </Text>
-                    <Text color="dimmed" size={15} mb={8}>
-                      {task.description}
-                    </Text>
-
-                    <Link
-                      href={`/t/${task.id}`}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <Button
-                        className={classes.commonButton}
-                        leftIcon={<IconFileArrowRight size={20} />}
-                      >
-                        Открыть
-                      </Button>
-                    </Link>
-                  </Timeline.Item>
-                ))}
-              </Timeline>
-            </Box>
-          </>
+        {tasksCompleted && tasksCompleted.length > 0 && (
+          <TasksBlock
+            tasks={tasksCompleted}
+            title="Выполненные Задачи"
+            bulletIcon={<IconCheck size={14} />}
+          />
         )}
       </Container>
 
       <Footer />
     </>
   );
-};
-
-export default EpicPage;
+}
