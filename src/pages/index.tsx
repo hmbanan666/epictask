@@ -12,17 +12,25 @@ import {
 } from '@mantine/core';
 import Link from 'next/link';
 import { type Epic } from '@prisma/client';
+import {
+  type GetServerSideProps,
+  type InferGetServerSidePropsType,
+} from 'next';
 import { Footer } from '../components/Footer';
 import { globalStyles } from '../utils/styles';
 import { prisma } from '../server/db';
 
-export const getServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps<{
+  epics: Epic[];
+}> = async () => {
   const epics = await prisma.epic.findMany();
 
   return { props: { epics } };
 };
 
-export default function HomePage({ epics }: { epics: Epic[] }) {
+export default function HomePage({
+  epics,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { classes } = globalStyles();
 
   return (
@@ -61,7 +69,7 @@ export default function HomePage({ epics }: { epics: Epic[] }) {
             Новые Эпики
           </Title>
           <Grid>
-            {epics?.map((epic: Epic) => (
+            {epics?.map((epic) => (
               <Grid.Col key={epic.id} sm={6}>
                 <Card p="lg" className={classes.coolCard}>
                   <Group position="apart" mt="xs" mb="xs">
