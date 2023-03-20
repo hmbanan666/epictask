@@ -352,8 +352,9 @@ export default function TaskPage({
     <>
       <Head>
         <title>
-          {task.title} | Задача в Эпике &quot;{epic?.title}&quot;
+          {task.title} | Задача в Эпике &quot;{epic.title}&quot;
         </title>
+        <meta name="description" content={task.description} />
       </Head>
 
       <Container className={classes.wrapper}>
@@ -457,21 +458,28 @@ export default function TaskPage({
                     </Link>
                   </div>
                 </List.Item>
-                <List.Item>
-                  <b>Автор:</b>{' '}
-                  <div>
-                    <Link href={`/u/${author?.username || ''}`}>
-                      <UnstyledButton className={classes.epicButton}>
-                        <Group spacing={8}>
-                          <Avatar src={author?.image} size="sm" radius="xl" />
-                          <Text>
-                            {author?.name} {author?.surname}
-                          </Text>
-                        </Group>
-                      </UnstyledButton>
-                    </Link>
-                  </div>
-                </List.Item>
+                {author?.username && (
+                  <List.Item>
+                    <b>Автор:</b>{' '}
+                    <div>
+                      <Link href={`/u/${author.username}`}>
+                        <UnstyledButton className={classes.epicButton}>
+                          <Group spacing={8}>
+                            <Avatar
+                              src={author?.image}
+                              alt={`Аватар пользователя ${author.username}`}
+                              size="sm"
+                              radius="xl"
+                            />
+                            <Text>
+                              {author?.name} {author?.surname}
+                            </Text>
+                          </Group>
+                        </UnstyledButton>
+                      </Link>
+                    </div>
+                  </List.Item>
+                )}
                 <List.Item>
                   <b>Опыт:</b>
                   <TextAnalysisBlock id={task.id} />

@@ -310,6 +310,7 @@ export default function EpicPage({
         <title>
           {epic.title} | Эпик {epic.id}
         </title>
+        <meta name="description" content={epic.description} />
       </Head>
 
       <Container className={classes.wrapper}>
