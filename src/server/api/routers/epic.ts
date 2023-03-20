@@ -1,30 +1,7 @@
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const epicRouter = createTRPCRouter({
-  id: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const epic = await ctx.prisma.epic.findUnique({
-        where: { id: input.id },
-        include: {
-          user: true,
-          task: {
-            orderBy: {
-              createdAt: 'desc',
-            },
-          },
-        },
-      });
-      if (!epic) return null;
-
-      return {
-        epic,
-        author: epic.user,
-        tasks: epic.task,
-      };
-    }),
-  findMany: publicProcedure.query(({ ctx }) => ctx.prisma.epic.findMany()),
   update: protectedProcedure
     .input(
       z.object({

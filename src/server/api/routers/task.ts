@@ -6,24 +6,6 @@ const FIRST_EPIC_ID = 'yjwd7pbd5ycuqlge8x0lds82';
 const FIRST_USER_ID = 'clepkr7240001lrbxb7fz2r4b';
 
 export const taskRouter = createTRPCRouter({
-  id: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const task = await ctx.prisma.task.findUnique({
-        where: { id: input.id },
-        include: {
-          epic: true,
-          user: true,
-        },
-      });
-      if (!task) return null;
-
-      return {
-        task,
-        epic: task.epic,
-        author: task.user,
-      };
-    }),
   create: protectedProcedure
     .input(
       z.object({

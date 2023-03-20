@@ -60,7 +60,6 @@ export const getServerSideProps: GetServerSideProps<{
     },
   });
 
-  // 404 if no epic found
   if (!epic) {
     return {
       notFound: true,
@@ -287,8 +286,6 @@ export default function EpicPage({
       </Card>
     );
   };
-
-  if (!epic) return null;
 
   if (isEditing) {
     return (

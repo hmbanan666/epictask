@@ -11,14 +11,31 @@ import {
 } from '@mantine/core';
 import React from 'react';
 import Link from 'next/link';
+import {
+  type GetServerSideProps,
+  type InferGetServerSidePropsType,
+} from 'next';
+import { type Epic } from '.prisma/client';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
-import { api } from '../../utils/api';
+import { prisma } from '../../server/db';
 
-const EpicsPage = () => {
+export const getServerSideProps: GetServerSideProps<{
+  epics: Epic[];
+}> = async () => {
+  const epics = await prisma.epic.findMany();
+
+  return {
+    props: {
+      epics,
+    },
+  };
+};
+
+export default function EpicsPage({
+  epics,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { classes } = globalStyles();
-
-  const { data: epics } = api.epic.findMany.useQuery();
 
   return (
     <>
@@ -63,6 +80,4 @@ const EpicsPage = () => {
       <Footer />
     </>
   );
-};
-
-export default EpicsPage;
+}

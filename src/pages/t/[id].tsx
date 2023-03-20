@@ -57,7 +57,6 @@ export const getServerSideProps: GetServerSideProps<{
     },
   });
 
-  // 404 if task not found
   if (!task) {
     return {
       notFound: true,
@@ -193,6 +192,7 @@ const EditingTaskBlock = ({
 
         <Text className={classes.coolTextEditorBlockTitle}>Текст:</Text>
         <TextEditor
+          wordsCount
           htmlContent={text}
           onUpdate={(value) => setText(value || '')}
         />
@@ -332,8 +332,6 @@ export default function TaskPage({
     });
   };
 
-  if (!task) return null;
-
   if (isEditing) {
     return (
       <Container className={classes.wrapper}>
@@ -366,13 +364,15 @@ export default function TaskPage({
 
         <Grid>
           <Grid.Col md={8}>
-            <Box style={{ marginBottom: 20 }}>
-              <Group spacing={8}>
-                <Text className={classes.statInfoElement}>?? лайков</Text>
-                <Text className={classes.statInfoElement}>?? просмотров</Text>
-                <Text className={classes.statInfoElement}>??? символов</Text>
-              </Group>
-            </Box>
+            {task.completedAt && (
+              <Box style={{ marginBottom: 20 }}>
+                <Group spacing={8}>
+                  <Text className={classes.statInfoElement}>?? лайков</Text>
+                  <Text className={classes.statInfoElement}>?? просмотров</Text>
+                  <Text className={classes.statInfoElement}>??? символов</Text>
+                </Group>
+              </Box>
+            )}
 
             <Box style={{ marginBottom: 40 }}>
               <p>{task.description}</p>
@@ -380,22 +380,24 @@ export default function TaskPage({
               <div dangerouslySetInnerHTML={{ __html: task?.text || '' }} />
             </Box>
 
-            <Box style={{ marginBottom: 40 }}>
-              <Card p="xl" className={classes.coolCard}>
-                <Title order={3}>Понравился материал?</Title>
-                <Text mb={12}>Поставь лайк, чтобы автор получил Опыт!</Text>
+            {task.completedAt && (
+              <Box style={{ marginBottom: 40 }}>
+                <Card p="xl" className={classes.coolCard}>
+                  <Title order={3}>Понравился материал?</Title>
+                  <Text mb={12}>Поставь лайк, чтобы автор получил Опыт!</Text>
 
-                <Group spacing={8}>
-                  <Button
-                    className={classes.likeButton}
-                    leftIcon={<IconThumbUp />}
-                    onClick={handleClickLikeButton}
-                  >
-                    Ставлю лайк!
-                  </Button>
-                </Group>
-              </Card>
-            </Box>
+                  <Group spacing={8}>
+                    <Button
+                      className={classes.likeButton}
+                      leftIcon={<IconThumbUp />}
+                      onClick={handleClickLikeButton}
+                    >
+                      Ставлю лайк!
+                    </Button>
+                  </Group>
+                </Card>
+              </Box>
+            )}
           </Grid.Col>
 
           <Grid.Col md={4}>
@@ -480,10 +482,12 @@ export default function TaskPage({
                     </div>
                   </List.Item>
                 )}
-                <List.Item>
-                  <b>Опыт:</b>
-                  <TextAnalysisBlock id={task.id} />
-                </List.Item>
+                {task.id && task.completedAt && (
+                  <List.Item>
+                    <b>Опыт:</b>
+                    <TextAnalysisBlock id={task.id} />
+                  </List.Item>
+                )}
               </List>
             </Card>
           </Grid.Col>

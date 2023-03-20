@@ -1,25 +1,47 @@
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { Avatar, Card, Container, Grid, List, Title } from '@mantine/core';
+import {
+  type GetServerSideProps,
+  type InferGetServerSidePropsType,
+} from 'next';
+import { type User } from '.prisma/client';
 import { Footer } from '../../components/Footer';
 import { globalStyles } from '../../utils/styles';
-import { api } from '../../utils/api';
 import { localTime } from '../../utils/date';
+import { prisma } from '../../server/db';
 
-const UserProfilePage = () => {
+export const getServerSideProps: GetServerSideProps<{ user: User }> = async ({
+  params,
+}) => {
+  const username = params?.username as string;
+  const user = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  if (!user) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      user,
+    },
+  };
+};
+
+export default function UserProfilePage({
+  user,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { classes } = globalStyles();
-  const { query } = useRouter();
-  const id = query.id as string;
-
-  const { data: user } = api.user.username.useQuery({ username: id });
-
-  if (!user) return null;
 
   return (
     <>
       <Head>
         <title>
-          {user?.name} {user?.surname} | Профиль специалиста на Эпике @{id}
+          {user?.name} {user?.surname} | Профиль специалиста на Эпике @
+          {user.username}
         </title>
       </Head>
 
@@ -61,6 +83,4 @@ const UserProfilePage = () => {
       <Footer />
     </>
   );
-};
-
-export default UserProfilePage;
+}
