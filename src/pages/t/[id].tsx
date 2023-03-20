@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import {
   Avatar,
@@ -26,10 +25,13 @@ import {
   IconSettings,
   IconThumbUp,
 } from '@tabler/icons-react';
-import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
-import { type Task } from '@prisma/client';
+import { type Epic, type Task, type User } from '@prisma/client';
 import { notifications } from '@mantine/notifications';
+import {
+  type GetServerSideProps,
+  type InferGetServerSidePropsType,
+} from 'next';
 import { globalStyles } from '../../utils/styles';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
@@ -37,6 +39,45 @@ import TextEditor from '../../components/TextEditor';
 import { CoolTimeAgo } from '../../components/CoolTimeAgo';
 import { CoolModal } from '../../components/CoolModal';
 import { CoolDatePicker } from '../../components/CoolDatePicker';
+import { prisma } from '../../server/db';
+import { getServerAuthSession } from '../../server/auth';
+
+export const getServerSideProps: GetServerSideProps<{
+  task: Task;
+  epic: Epic;
+  author: User;
+  isAuthor: boolean;
+}> = async ({ params, req, res }) => {
+  const taskId = params?.id as string;
+  const task = await prisma.task.findUnique({
+    where: { id: taskId },
+    include: {
+      epic: true,
+      user: true,
+    },
+  });
+
+  // 404 if task not found
+  if (!task) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const { epic, user: author } = task;
+
+  const session = await getServerAuthSession({ req, res });
+  const isAuthor = session?.user?.id === author?.id;
+
+  return {
+    props: {
+      task,
+      epic,
+      author,
+      isAuthor,
+    },
+  };
+};
 
 const TextAnalysisBlock = ({ id }: { id: string }) => {
   const { data } = api.task.analyzeText.useQuery({ id });
@@ -77,13 +118,11 @@ const TextAnalysisBlock = ({ id }: { id: string }) => {
 const EditingTaskBlock = ({
   task,
   isSaving,
-  dataRefetch,
   setIsSaving,
   setIsEditing,
 }: {
   task: Task;
   isSaving: boolean;
-  dataRefetch: () => unknown;
   setIsSaving: (value: boolean) => void;
   setIsEditing: (value: boolean) => void;
 }) => {
@@ -95,7 +134,6 @@ const EditingTaskBlock = ({
 
   const taskMutation = api.task.update.useMutation({
     onSuccess: () => {
-      dataRefetch();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       notifications.update({
         id: 'update-task',
@@ -105,6 +143,8 @@ const EditingTaskBlock = ({
         icon: <IconCheck size={16} />,
         autoClose: 2500,
       });
+      // refresh page
+      window.location.reload();
     },
   });
 
@@ -161,22 +201,14 @@ const EditingTaskBlock = ({
   );
 };
 
-const TaskPage = () => {
+export default function TaskPage({
+  task,
+  epic,
+  author,
+  isAuthor,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { classes } = globalStyles();
-  const router = useRouter();
-  const id = router.query.id as string;
 
-  const { data: session } = useSession();
-
-  const { data: taskData, refetch: taskDataRefetch } = api.task.id.useQuery({
-    id,
-  });
-
-  const task = taskData?.task;
-  const epic = taskData?.epic;
-  const author = taskData?.author;
-
-  const isAuthor = session?.user?.id === task?.authorId;
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -187,7 +219,6 @@ const TaskPage = () => {
 
   const taskDataMutation = api.task.updateData.useMutation({
     onSuccess: () => {
-      void taskDataRefetch();
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
       notifications.update({
         id: 'update-task-data',
@@ -197,6 +228,8 @@ const TaskPage = () => {
         icon: <IconCheck size={16} />,
         autoClose: 2500,
       });
+      // refresh page
+      window.location.reload();
     },
   });
 
@@ -217,7 +250,7 @@ const TaskPage = () => {
     });
 
     setIsEditingData(false);
-    taskDataMutation.mutate({ id, deadlineAt });
+    taskDataMutation.mutate({ id: task.id, deadlineAt });
   };
 
   const handleClickMarkTaskCompleted = (
@@ -237,7 +270,7 @@ const TaskPage = () => {
     });
 
     setIsEditingData(false);
-    taskDataMutation.mutate({ id, isCompleted: true });
+    taskDataMutation.mutate({ id: task.id, isCompleted: true });
   };
 
   const AuthorTaskBlock = () => {
@@ -307,7 +340,6 @@ const TaskPage = () => {
         {isAuthor && <AuthorTaskBlock />}
         <EditingTaskBlock
           task={task}
-          dataRefetch={taskDataRefetch}
           isSaving={isSaving}
           setIsSaving={setIsSaving}
           setIsEditing={setIsEditing}
@@ -442,7 +474,7 @@ const TaskPage = () => {
                 </List.Item>
                 <List.Item>
                   <b>Опыт:</b>
-                  <TextAnalysisBlock id={task?.id} />
+                  <TextAnalysisBlock id={task.id} />
                 </List.Item>
               </List>
             </Card>
@@ -489,6 +521,4 @@ const TaskPage = () => {
       </CoolModal>
     </>
   );
-};
-
-export default TaskPage;
+}
