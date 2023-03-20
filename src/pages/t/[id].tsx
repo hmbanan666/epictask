@@ -22,6 +22,7 @@ import {
   IconCircleFilled,
   IconDeviceFloppy,
   IconEdit,
+  IconEye,
   IconSettings,
   IconThumbUp,
 } from '@tabler/icons-react';
@@ -41,6 +42,7 @@ import { CoolModal } from '../../components/CoolModal';
 import { CoolDatePicker } from '../../components/CoolDatePicker';
 import { prisma } from '../../server/db';
 import { getServerAuthSession } from '../../server/auth';
+import { russianWordEnding } from '../../utils/helpers';
 
 export const getServerSideProps: GetServerSideProps<{
   task: Task;
@@ -67,6 +69,12 @@ export const getServerSideProps: GetServerSideProps<{
 
   const session = await getServerAuthSession({ req, res });
   const isAuthor = session?.user?.id === author?.id;
+
+  // Add +1 view
+  await prisma.task.update({
+    where: { id: taskId },
+    data: { views: { increment: 1 } },
+  });
 
   return {
     props: {
@@ -367,9 +375,19 @@ export default function TaskPage({
             {task.completedAt && (
               <Box style={{ marginBottom: 20 }}>
                 <Group spacing={8}>
-                  <Text className={classes.statInfoElement}>?? лайков</Text>
-                  <Text className={classes.statInfoElement}>?? просмотров</Text>
-                  <Text className={classes.statInfoElement}>??? символов</Text>
+                  <Group spacing={7} className={classes.statInfoElement}>
+                    <IconEye size={20} opacity={0.5} />
+                    <Text>
+                      {task.views}{' '}
+                      {russianWordEnding(task.views as number, [
+                        'просмотр',
+                        'просмотра',
+                        'просмотров',
+                      ])}
+                    </Text>
+                  </Group>
+                  {/*<Text className={classes.statInfoElement}>?? лайков</Text>*/}
+                  {/*<Text className={classes.statInfoElement}>??? символов</Text>*/}
                 </Group>
               </Box>
             )}
@@ -382,7 +400,7 @@ export default function TaskPage({
 
             {task.completedAt && (
               <Box style={{ marginBottom: 40 }}>
-                <Card p="xl" className={classes.coolCard}>
+                <Card p="lg" className={classes.coolCard}>
                   <Title order={3}>Понравился материал?</Title>
                   <Text mb={12}>Поставь лайк, чтобы автор получил Опыт!</Text>
 
