@@ -33,6 +33,7 @@ import {
   type GetServerSideProps,
   type InferGetServerSidePropsType,
 } from 'next';
+import Image from 'next/image';
 import { globalStyles } from '../../utils/styles';
 import { Footer } from '../../components/Footer';
 import { api } from '../../utils/api';
@@ -399,19 +400,29 @@ export default function TaskPage({
             </Box>
 
             {task.completedAt && (
-              <Box style={{ marginBottom: 40 }}>
+              <Box mb={40}>
                 <Card p="lg" className={classes.coolCard}>
-                  <Title order={3}>Понравился материал?</Title>
-                  <Text mb={12}>Поставь лайк, чтобы автор получил Опыт!</Text>
+                  <Group spacing={15}>
+                    <Image
+                      src="/emoji/thumbs_up.gif"
+                      width={80}
+                      height={80}
+                      alt=""
+                    />
+                    <Box>
+                      <Title order={3}>Понравился материал?</Title>
+                      <Text mb={12}>
+                        Поставь лайк, чтобы автор получил Опыт!
+                      </Text>
 
-                  <Group spacing={8}>
-                    <Button
-                      className={classes.likeButton}
-                      leftIcon={<IconThumbUp />}
-                      onClick={handleClickLikeButton}
-                    >
-                      Ставлю лайк!
-                    </Button>
+                      <Button
+                        className={classes.likeButton}
+                        leftIcon={<IconThumbUp />}
+                        onClick={handleClickLikeButton}
+                      >
+                        Ставлю лайк!
+                      </Button>
+                    </Box>
                   </Group>
                 </Card>
               </Box>
