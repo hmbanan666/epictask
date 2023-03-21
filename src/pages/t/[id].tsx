@@ -380,7 +380,7 @@ export default function TaskPage({
                     <IconEye size={20} opacity={0.5} />
                     <Text>
                       {task.views}{' '}
-                      {russianWordEnding(task.views as number, [
+                      {russianWordEnding(task.views, [
                         'просмотр',
                         'просмотра',
                         'просмотров',
